@@ -1,13 +1,20 @@
+Sean Evans Consensys block chain developer bootcamp final project
+Nov 2021
+Ethereum address : evadev.eth
+email : robertseanevans@icloud.com
+
+**Directory structure**
+
 The Covid pandemic has shone a spotlight on the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology given certain simplifying assumptions.
 
-There are 4 main concepts in the process :
-A = Donors        : have funds available and want them to go to the needy
-B = Donations     : a portion of the donor funds with some metadata.
-                    a donors can make multiple donations
-C = Distributors  : have on the ground connections with the needy (Also called NGO’s)
-D = Distributions : links a donation to a list of recipients and can be allocated funds of successful
-                    a distributor can create multiple distributions
-                    a distribution can only come from one donation
+There are 4 main concepts in the donation manager process :
+A = Donors        : Have funds available and want them to go to the needy
+B = Donations     : A portion of the donor funds with some metadata.
+                    A donors can make multiple donations
+C = Distributors  : Have on the ground connections with the needy (Also called NGO’s)
+D = Distributions : Links a donation to a list of recipients and can be allocated funds of successful
+                    A distributor can create multiple distributions
+                    A distribution can only come from one donation
 
 **Simplified workflow on the website**
 1. Donors will
@@ -23,6 +30,8 @@ D = Distributions : links a donation to a list of recipients and can be allocate
     2. create a distribution against a donation that has been funded
     3. request the funding from the donation for a specific distribution
     4. withdraw funds from the distributor's balance  
+
+![Screenshot](flow.png)
 
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.
