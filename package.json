@@ -1,0 +1,32 @@
+{
+  "name": "donationmanager",
+  "version": "1.0.0",
+  "description": "final project consensys block chain boot camp",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EvaDev/blockchain-developer-bootcamp-final-project.git"
+  },
+  "keywords": [
+    "donation",
+    "manager"
+  ],
+  "author": "sean evans",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EvaDev/blockchain-developer-bootcamp-final-project/issues"
+  },
+  "homepage": "https://github.com/EvaDev/blockchain-developer-bootcamp-final-project#readme",
+  "dependencies": {
+    "zeppelin-solidity": "^1.12.0"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.3.2"
+  }
+}

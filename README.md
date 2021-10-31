@@ -3,7 +3,6 @@ Nov 2021
 Ethereum address : evadev.eth
 email : robertseanevans@icloud.com
 
-
 **Directory structure**
 
 The Covid pandemic has shone a spotlight on the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology given certain simplifying assumptions.

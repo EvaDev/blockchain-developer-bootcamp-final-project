@@ -4,68 +4,76 @@ pragma solidity ^0.8.2;
 /// @title A contract for managing donations and distribution of donated funds
 /// @author Sean Evans Nov 2021
 /// @notice This contract is meant for the Consensys academoy final project
-/// @dev
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable, OwnableUpgradeable, ERC20PermitUpgradeable {
+//contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable, OwnableUpgradeable, ERC20PermitUpgradeable {
+contract DonationManager is ERC20, Pausable, Ownable {
 
-    enum DonationState      { DonationCreated, Funded, Distributing, DonationClosed }
-    enum DonationPurpose    { FoodTokens, Hospital, Disaster , Covid, NotSpecified }
+    enum DonationState      { DonationCreated, Funded, Distributing }
+    enum DonationPurpose    { FoodTokens, Hospital, Disaster }
     enum DistributorStatus  { New, unTrusted, Trusted }
-    enum DistributionState  { DistributionCreated, FundsRequested, FundsApproved , FundsNOTApproved, DistributionClosed }
-    enum DistributionMethod { FundsToRecipient, FundsToDistributor, FundsToOriganisation, TokenToRecipient, TokenToRetailer }
+    enum DistributionState  { DistributionCreated, FundsRequested, FundsApproved , FundsNOTApproved }
 
+    /// @dev Donor Details
+    /// @notice  AmountDonated is the amount of balance ring fenced to all donations
     struct Donor {
-       uint32       donorID;                        /// @dev Donor Details
-       address      donorAddress;                   /// @dev Donor Depositor Wallet
-       uint256      amountDonated;                  /// @dev Amount of balance ring fenced to donations
-       string       donorName;                      /// @dev Donor Name
+       uint32       donorID;
+       address      donorAddress;
+       uint256      amountDonated;
+       string       donorName;
     }
 
+    /// @dev Organisation responsible for distributing funds to recipients
     struct  Distributor {
-       uint32       distributorID;                  /// @dev Org responsible for distributing funds to recipients
-       address      distributorAddress;             /// @dev Can transfer funds to a distributor from a donation
-       string       distributorName;                /// @dev Distributor Name
-       string       distributorCountry;             /// @dev Distributor Country
-       DistributorStatus  distributorStatus;        /// @dev Status of the Distributor
+       uint32       distributorID;
+       address      distributorAddress;
+       string       distributorName;
+       string       distributorCountry;
+       DistributorStatus  distributorStatus;
     }
 
+    /// @dev Currently one donor per donation but one donor can do many donations
+    /// @notice donationAmount = Funds availalbe to be claimed (must be <= donor's balance)
+    /// @notice donationGrantedAmount = Funds approved to distributions - possibly sent to distributor
+    /// @notice requestedNotGrantedAmount = Funds requested by distributors but not granted (approved) yet - potential claims
+    /// @dev A donation can have multiple distributions
     struct  Donation {
-       uint32       donationID;                     /// @dev Identifier for this Donation
-       uint32       donorID;                        /// @dev Donor : Currently one donor per donation (Donors full balance is available to this donation)
-       string       donationName;                   /// @dev Donation Name
-       uint256      donationAmount;                 /// @dev Funds availalbe to be claimed (must be <= donor's balance)
-       uint256      donationGrantedAmount;          /// @dev Funds approved to distributions - possibly sent to distributor
-       uint256      requestedNotGrantedAmount;      /// @dev Funds requested by distributors but not granted (approved) yet - potential claims
+       uint32       donationID;
+       uint32       donorID;
+       string       donationName;
+       uint256      donationAmount;
+       uint256      donationGrantedAmount;
+       uint256      requestedNotGrantedAmount;
        uint32       USDperRecipientPerMonth;
        uint8        adminFeePercent;
        DonationState    donationState;
        DonationPurpose  donationPurpose;
-       uint32[]         distributionIDs;            /// @dev A donation can have multiple distributions
+       uint32[]         distributionIDs;
     }
 
+    /// @dev distributionAmount = USD per person * recipientCountr * distributionMonths
+    /// @notice Number of recipients with trusted details; New distributors max 1000 recipients or USD 50k
+    /// @notice Number of months to run the distribution; for example New distributors can only run 1 month
+    /// @dev recipientDetailsAreValid is not properly implemented yet: possibly check against IPFS link to unmodifiable list of trusted recipients
     struct  Distribution {
-       uint32       distributionID;                 /// @dev Identifiier for this distribution
-       uint32       distributorID;                  /// @dev Org responsible for distributing funds to recipients
-       uint32       donationID;                     /// @dev Donation record
-       uint32       donorID;                        /// @dev Donor providing the funds
-       uint256      distributionAmount;             /// @dev USD per person * recipientCountr * distributionMonths
-       uint32       recipientCount;                 /// @dev Number of recipients with trusted details; New distributors max 1000 recipients or USD 50k
-       uint8        distributionMonths;             /// @dev Number of months to run the distribution; New distributors can only run 1 month
-       bool         recipientDetailsAreValid;       /// @dev Not implemented : check against IPFS link to unmodifiable list of trusted recipients
+       uint32       distributionID;
+       uint32       distributorID;
+       uint32       donationID;
+       uint32       donorID;
+       uint256      distributionAmount;
+       uint32       recipientCount;
+       uint8        distributionMonths;
+       bool         recipientDetailsAreValid;
        DistributionState  distributionState;
-       DistributionMethod distributionMethod;
     }
 
     /// @dev Donors
     uint32 public donorCount;
     mapping (uint32 => Donor )   public allDonors;
-    mapping (address => uint256) public donorBalances;    // Donation Balances
+    mapping (address => uint256) public donorBalances;
     event LogDonorAdded(address indexed donorAddress, uint32 donorID);
     event LogDonorDeposit(address indexed donorAddress, uint256 donationAmount);
     event LogDonorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
@@ -73,14 +81,13 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
     /// @dev Distributors
     uint32 public distributorCount;
     mapping (uint32 => Distributor ) public allDistributors;
-    mapping (address => uint256)     public distributorBalances;    // Distributor Balances
+    mapping (address => uint256)     public distributorBalances;
     event LogDistributorStatus(address indexed distributorAddress, uint32 distributorID,  string distributorName, string distributorStatus);
     event LogDistributorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
 
     /// @dev Donations
     uint32 public donationCount;
-    //mapping (uint32 => Donation )   public allDonations;
-    // Note to self : Using arrays rather than mappings where I need to iterate over contents
+    /// @dev Using arrays rather than mappings where I need to iterate over the contents
     Donation[] public donations;
     event LogDonationState(uint32 donationID, string donationName, DonationState);
 
@@ -133,8 +140,13 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
         _;
     }
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() initializer {
+    modifier donationIsFunded(uint32 _donationID) {
+        require((donations[_donationID].donationState == DonationState.Funded || donations[_donationID].donationState == DonationState.Distributing),
+        "Distribution cannot proceed until donation is funded.");
+        _;
+    }
+
+    constructor() ERC20("", "") {
         donorCount = 0;
         distributorCount = 0;
         donationCount = 0;
@@ -147,7 +159,7 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
             donorID     : donorCount,
             donorAddress:  payable(msg.sender),
             amountDonated : 0,
-            donorName   : _donorName   //, donationIDs : []
+            donorName   : _donorName
         });
         donorBalances[msg.sender] = 0;
         emit LogDonorAdded(msg.sender, donorCount);
@@ -163,9 +175,9 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
             distributorAddress  : payable(msg.sender),
             distributorName: _distributorName,
             distributorCountry: _distributorCountry,
-            distributorStatus: DistributorStatus.New  //,distributionIDs : []
+            distributorStatus: DistributorStatus.New
         });
-        // Set the donation balance to
+        /// @notice  Set the donation balance to
         distributorBalances[msg.sender] = 0;
         emit LogDistributorStatus(msg.sender, distributorCount, _distributorName, "New");
         distributorCount = distributorCount + 1;
@@ -176,7 +188,6 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
     function createDonation(string memory _donationName, uint32  _donorID,
         uint32  _USDperRecipientPerMonth, uint8  _adminFeePercent, uint32 _donationPurpose)
         public isDonor returns ( bool ) {
-        // Create a new donation
         Donation storage d = donations[donationCount];
         d.donorID                 = _donorID;
         d.donationName            = _donationName;
@@ -240,15 +251,15 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
     }
 
     /// @dev Create a new distribution - It connot come from an exiting donor
+    /// @notice Requires that The donor list is verified - verification of lists to happen outside on IPFS - not implemented
     function createDistribution(uint32 _distributorID, uint32 _donationID, uint32 _recipientCount, uint8 _distributionMonths,
-                                bool _recipientDetailsAreValid, uint8 _distributionMethod)
-                                public isDistributor  returns( bool ) {
+                                bool _recipientDetailsAreValid)
+                                public isDistributor donationIsFunded(_donationID) returns( bool ) {
 
         uint32  distributionClaim = _recipientCount * _distributionMonths * donations[_donationID].USDperRecipientPerMonth;
         uint256  availableToClaim  = donations[_donationID].donationAmount -
                                 (donations[_donationID].donationGrantedAmount + donations[_donationID].requestedNotGrantedAmount);
         require( availableToClaim >= distributionClaim, "This donation has insufficient funds to distribute." );
-        /// @notice Requires that The donor list is verified - verification of lists to happen outside on IPFS
         Distribution storage dist = distributions[distributionCount];
 
             dist.distributorID           = _distributorID;
@@ -259,23 +270,22 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
             dist.distributionMonths      = _distributionMonths;
             dist.recipientDetailsAreValid  = _recipientDetailsAreValid;
             dist.distributionState       = DistributionState.DistributionCreated;
-            dist.distributionMethod      = DistributionMethod(_distributionMethod);
 
         emit LogDistributionState(distributionCount, allDistributors[_distributorID].distributorName,
-                                  donations[_donationID].donationName, DistributionState(_distributionMethod));
+                                  donations[_donationID].donationName, DistributionState.DistributionCreated);
 
         /// @notice Now make a claim against the Donation
         donations[_donationID].requestedNotGrantedAmount += distributionClaim;
         distributions[distributionCount].distributionState = DistributionState.FundsRequested;
         emit LogDistributionState(distributionCount, allDistributors[_distributorID].distributorName,
-                                  donations[_donationID].donationName, DistributionState(_distributionMethod));
+                                  donations[_donationID].donationName, DistributionState.FundsRequested);
         distributionCount = distributionCount + 1;
         return true;
     }
 
     /// @dev send funds to a Distribution if the conditions are met
+    /// @notice if successful Update the amount granted on the donation and reduce the amount requested
     function requestDonationFunds(uint32 _distributionID) public payable isDonor distributionCanProceed(_distributionID) {
-      /// @notice Update the amount granted on the donation and reduce the amount requested
       donations[distributions[_distributionID].donationID].donationGrantedAmount += distributions[_distributionID].distributionAmount;
       donations[distributions[_distributionID].donorID].requestedNotGrantedAmount -= distributions[_distributionID].distributionAmount;
       distributions[_distributionID].distributionState = DistributionState.FundsApproved;
@@ -285,10 +295,9 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
       emit LogDonationState(distributions[_distributionID].donationID,
                             donations[distributions[_distributionID].donationID].donationName,
                             DonationState.Funded);
-      /// @notice Transfer funds from donor to distributor
       address distAddr = payable(allDistributors[distributions[_distributionID].distributorID].distributorAddress);
       uint256 distrAmt = distributions[_distributionID].distributionAmount;
-      // Check that this is actually seding from donor to distributor
+      /// @notice Check that this is actually seding from donor to distributor
       (bool sent,) = distAddr.call{value: distrAmt}("");
       require(sent, "Failed to send funds to the distributor");
     }
@@ -313,13 +322,13 @@ contract DonationManager is Initializable, ERC20Upgradeable, PausableUpgradeable
       require(sent, "Failed to withdraw funds to the donor");
     }
 
-    function initialize() initializer public {
+/*    function initialize() initializer public {
         __ERC20_init("MyToken", "MTK");
         __Pausable_init();
         __Ownable_init();
         __ERC20Permit_init("MyToken");
     }
-
+*/
     function pause() public onlyOwner {
         _pause();
     }
