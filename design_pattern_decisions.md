@@ -7,11 +7,14 @@ email : robertseanevans@icloud.com
 
 For simplicity I wanted to keep everything in a single contract but this may cause contract size limit issues.
 
-The main contract is ownable to allow the contract owner to pause the contract.
+**Access Control**
+The main contract is ownable to allow the donation manager contract owner to pause the contract.
+This is implemented inheriting from the openZeppelin Ownable.sol contract.
 
-Different roles are created within the contract and these are enforced with modifiers
-- Donors  (can create & fund Donations, Approve funds to distributors)
-- Distributors (can create distributions, request funds)
+Within the contract different roles are created and these are enforced with function modifiers
+- Donors  (eg can create & fund Donations, Approve funds to distributors)
+- Distributors (eg can create distributions, request funds etc)
 
+**Data model**
 A key design decision are the data structures to support these relationships
  ![Screenshot](model.png)

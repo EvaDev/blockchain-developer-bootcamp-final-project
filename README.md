@@ -39,6 +39,15 @@ D = Distributions : Links a donation to a list of recipients and can be allocate
 
 ![Screenshot](flow.png)
 
+Run Instructions
+1. in one terminal window
+    npx ganache-cli --deterministic
+2. in a second terminal window
+   npx truffle migrate --network development
+
+   to recompile all
+   npx truffle compile --all
+
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.
 
