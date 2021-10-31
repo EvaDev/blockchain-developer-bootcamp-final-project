@@ -1,11 +1,17 @@
+Donation Manager
 Sean Evans Consensys block chain developer bootcamp final project
 Nov 2021
 Ethereum address : evadev.eth
 email : robertseanevans@icloud.com
 
 **Directory structure**
+contracts/: Contains the Solidity source files for our smart contracts.
+migrations/: scripts to migrate
+test/: Contains both JavaScript and Solidity tests for our smart contracts
+truffle-config.js: Truffle configuration file
+node_modules/ contains the openzeppelin contracts created with npm install --save-dev @openzeppelin/contracts
 
-The Covid pandemic has shone a spotlight on the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology given certain simplifying assumptions.
+In South Africa where I live the Covid pandemic has highlighted the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology given certain simplifying assumptions.
 
 There are 4 main concepts in the donation manager process :
 A = Donors        : Have funds available and want them to go to the needy
@@ -17,16 +23,16 @@ D = Distributions : Links a donation to a list of recipients and can be allocate
                     A distribution can only come from one donation
 
 **Simplified workflow on the website**
-1. Donors will
-    1. register themselves
+1. Donors can
+    1. register
     2. create a donation with
         2.1. Amount available for distribution, and how many USD per recipient per month they are willing to fund
     3. deposit funds into the donation manager contract under the donor's address
     4. approve or deny funds to be sent to a distributor once conditions are met
     5. get their donation balances
     6. optionally withdraw any unused funds out of the donor's balance
-2. Distributors  will
-    1. register themselves
+2. Distributors can
+    1. register
     2. create a distribution against a donation that has been funded
     3. request the funding from the donation for a specific distribution
     4. withdraw funds from the distributor's balance  

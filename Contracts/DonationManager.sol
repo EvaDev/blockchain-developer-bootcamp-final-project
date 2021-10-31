@@ -73,7 +73,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
     /// @dev Donors
     uint32 public donorCount;
     mapping (uint32 => Donor )   public allDonors;
-    mapping (address => uint256) public donorBalances;
+    mapping (address => uint256) internal donorBalances;
     event LogDonorAdded(address indexed donorAddress, uint32 donorID);
     event LogDonorDeposit(address indexed donorAddress, uint256 donationAmount);
     event LogDonorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
@@ -81,7 +81,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
     /// @dev Distributors
     uint32 public distributorCount;
     mapping (uint32 => Distributor ) public allDistributors;
-    mapping (address => uint256)     public distributorBalances;
+    mapping (address => uint256)     internal distributorBalances;
     event LogDistributorStatus(address indexed distributorAddress, uint32 distributorID,  string distributorName, string distributorStatus);
     event LogDistributorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
 
@@ -248,6 +248,11 @@ contract DonationManager is ERC20, Pausable, Ownable {
             }
       }
       return (_donatedAmount,_grantedAmount,_requestedNotGranted,donorBalances[msg.sender] );
+    }
+
+    /// @dev Get the balances of the ddistributor across all distributions
+    function getDistributorBalance() public isDistributor view returns (uint256 availbleToWithdraw) {
+      return (distributorBalances[msg.sender]);
     }
 
     /// @dev Create a new distribution - It connot come from an exiting donor
