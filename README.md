@@ -7,9 +7,13 @@ email : robertseanevans@icloud.com
 **Directory structure**
 contracts/: Contains the Solidity source files for our smart contracts.
 migrations/: scripts to migrate
-test/: Contains both JavaScript and Solidity tests for our smart contracts
+test/: Contains Solidity tests for our smart contracts
+        dependency npm install --save-dev chai
+        dependency npm install --save-dev @openzeppelin/test-helpers
+        dependency npm install --save-dev @openzeppelin/test-environment
 truffle-config.js: Truffle configuration file
-node_modules/ contains the openzeppelin contracts created with npm install --save-dev @openzeppelin/contracts
+node_modules/ contains the openzeppelin contracts
+        dependency npm install --save-dev @openzeppelin/contracts
 
 In South Africa where I live the Covid pandemic has highlighted the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology given certain simplifying assumptions.
 

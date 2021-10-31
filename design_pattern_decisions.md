@@ -6,6 +6,12 @@ email : robertseanevans@icloud.com
 **Design Pattern Decisions**
 
 For simplicity I wanted to keep everything in a single contract but this may cause contract size limit issues.
+I ran this : https://soliditydeveloper.com/max-contract-size
+npm install truffle-contract-size
+Add the plugin to the truffle-config.js: plugins: ["truffle-contract-size"]
+Run truffle run contract-size
+
+
 
 **Access Control**
 The main contract is ownable to allow the donation manager contract owner to pause the contract.
