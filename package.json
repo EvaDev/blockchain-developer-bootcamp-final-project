@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/EvaDev/blockchain-developer-bootcamp-final-project#readme",
   "dependencies": {
+    "truffle-assertions": "^0.9.2",
     "truffle-contract-size": "^2.0.1",
     "zeppelin-solidity": "^1.12.0"
   },

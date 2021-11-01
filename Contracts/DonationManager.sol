@@ -51,8 +51,8 @@ contract DonationManager is ERC20, Pausable, Ownable {
        uint8        adminFeePercent;
        DonationState    donationState;
        DonationPurpose  donationPurpose;
-       uint32[]         distributionIDs;
     }
+    //uint32[]         distributionIDs;
 
     /// @dev distributionAmount = USD per person * recipientCountr * distributionMonths
     /// @notice Number of recipients with trusted details; New distributors max 1000 recipients or USD 50k
@@ -73,8 +73,8 @@ contract DonationManager is ERC20, Pausable, Ownable {
     /// @dev Donors
     uint32 public donorCount;
     mapping (uint32 => Donor )   public allDonors;
-    mapping (address => uint256) internal donorBalances;
-    event LogDonorAdded(address indexed donorAddress, uint32 donorID);
+    mapping (address => uint256) public donorBalances;
+    event LogDonorAdded(address indexed donorAddress, uint32 donorID, uint256 balance);
     event LogDonorDeposit(address indexed donorAddress, uint256 donationAmount);
     event LogDonorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
 
@@ -153,16 +153,19 @@ contract DonationManager is ERC20, Pausable, Ownable {
         distributionCount = 0;
     }
 
-    /// @dev Create a new distributor - It connot come from the same address as an exiting distributor
-    function createDonor(string memory _donorName)  public onlyDonor returns( bool ) {
+    /// @dev Create a new donor - It connot come from the same address as an exiting distributor
+    /// @dev amount donated is just a running balance, not an actual account balance
+    function createDonor(string memory _donorName, uint256 currentBalance) payable public onlyDonor returns( bool ) {
         allDonors[donorCount] = Donor( {
-            donorID     : donorCount,
-            donorAddress:  payable(msg.sender),
-            amountDonated : 0,
-            donorName   : _donorName
+            donorID         : donorCount,
+            donorAddress    :  payable(msg.sender),
+            amountDonated   : 0,
+            donorName       : _donorName
         });
-        donorBalances[msg.sender] = 0;
-        emit LogDonorAdded(msg.sender, donorCount);
+        //donorBalances[msg.sender] = 0;
+        // Set donor balance to amount in donor's account
+        donorBalances[msg.sender] = currentBalance;
+        emit LogDonorAdded(msg.sender, donorCount, msg.value);
         donorCount = donorCount + 1;
         return true;
     }
@@ -171,11 +174,11 @@ contract DonationManager is ERC20, Pausable, Ownable {
     function createDistributor(string memory _distributorName, string memory _distributorCountry)
         public onlyDistributor returns ( bool ) {
         allDistributors[distributorCount] = Distributor( {
-            distributorID   : distributorCount,
+            distributorID       : distributorCount,
             distributorAddress  : payable(msg.sender),
-            distributorName: _distributorName,
-            distributorCountry: _distributorCountry,
-            distributorStatus: DistributorStatus.New
+            distributorName     : _distributorName,
+            distributorCountry  : _distributorCountry,
+            distributorStatus   : DistributorStatus.New
         });
         /// @notice  Set the donation balance to
         distributorBalances[msg.sender] = 0;
@@ -188,25 +191,32 @@ contract DonationManager is ERC20, Pausable, Ownable {
     function createDonation(string memory _donationName, uint32  _donorID,
         uint32  _USDperRecipientPerMonth, uint8  _adminFeePercent, uint32 _donationPurpose)
         public isDonor returns ( bool ) {
-        Donation storage d = donations[donationCount];
-        d.donorID                 = _donorID;
-        d.donationName            = _donationName;
-        d.donationAmount          = 0;
-        d.donationGrantedAmount   = 0;
-        d.requestedNotGrantedAmount = 0;
-        d.USDperRecipientPerMonth = _USDperRecipientPerMonth;
-        d.adminFeePercent         = _adminFeePercent;
-        d.donationState           = DonationState.DonationCreated;
-        d.donationPurpose         = DonationPurpose(_donationPurpose);
 
-        /// @notice Add this donation to the donor
+        Donation memory currentDonation;
+
+        currentDonation.donationID                  = donationCount;
+        currentDonation.donorID                     = _donorID;
+        currentDonation.donationName                = _donationName;
+        currentDonation.donationAmount              = 0;
+        currentDonation.donationGrantedAmount       = 0;
+        currentDonation.requestedNotGrantedAmount   = 0;
+        currentDonation.USDperRecipientPerMonth     = _USDperRecipientPerMonth;
+        currentDonation.adminFeePercent             = _adminFeePercent;
+        donations.push(currentDonation);
+
+/*
+        d.donationPurpose         = DonationPurpose.FoodTokens;
+        d.donationPurpose         = DonationPurpose.FoodTokens(_donationPurpose);
+*/
         emit LogDonationState(donationCount, _donationName, DonationState.DonationCreated);
+        /// @notice Add this donation to the donor
         donationCount = donationCount + 1;
         return true;
     }
 
     function donorDeposit(uint256 _depositAmount) public isDonor payable {
         donorBalances[msg.sender] += _depositAmount;
+        require(msg.value > _depositAmount, "Insufficient funds");
         (bool sent,) = msg.sender.call{value: _depositAmount}("");
         require(sent, "Failed to deposit funds to the donor");
         emit LogDonorDeposit(msg.sender, _depositAmount);
@@ -218,6 +228,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
       uint32 donorID = donations[_donationID].donorID;
       allDonors[donorID].amountDonated += _donationAmount;
       donations[_donationID].donationAmount += _donationAmount;
+      donations[_donationID].donationState = DonationState.Funded;
       emit LogDonationState(_donationID, donations[_donationID].donationName, DonationState.Funded);
     }
 
@@ -255,7 +266,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
       return (distributorBalances[msg.sender]);
     }
 
-    /// @dev Create a new distribution - It connot come from an exiting donor
+    /// @dev Create a new distribution - It cannot come from an exiting donor
     /// @notice Requires that The donor list is verified - verification of lists to happen outside on IPFS - not implemented
     function createDistribution(uint32 _distributorID, uint32 _donationID, uint32 _recipientCount, uint8 _distributionMonths,
                                 bool _recipientDetailsAreValid)
@@ -265,16 +276,18 @@ contract DonationManager is ERC20, Pausable, Ownable {
         uint256  availableToClaim  = donations[_donationID].donationAmount -
                                 (donations[_donationID].donationGrantedAmount + donations[_donationID].requestedNotGrantedAmount);
         require( availableToClaim >= distributionClaim, "This donation has insufficient funds to distribute." );
-        Distribution storage dist = distributions[distributionCount];
 
-            dist.distributorID           = _distributorID;
-            dist.donationID              = _donationID;
-            dist.donorID                 = donations[_donationID].donorID;
-            dist.distributionAmount      = distributionClaim;
-            dist.recipientCount          = _recipientCount;
-            dist.distributionMonths      = _distributionMonths;
-            dist.recipientDetailsAreValid  = _recipientDetailsAreValid;
-            dist.distributionState       = DistributionState.DistributionCreated;
+        Distribution memory currentDistribution;
+            currentDistribution.distributionID          = distributionCount;
+            currentDistribution.distributorID           = _distributorID;
+            currentDistribution.donationID              = _donationID;
+            currentDistribution.donorID                 = donations[_donationID].donorID;
+            currentDistribution.distributionAmount      = distributionClaim;
+            currentDistribution.recipientCount          = _recipientCount;
+            currentDistribution.distributionMonths      = _distributionMonths;
+            currentDistribution.recipientDetailsAreValid  = _recipientDetailsAreValid;
+            //currentDistribution.distributionState       = DistributionState.DistributionCreated;
+            distributions.push(currentDistribution);
 
         emit LogDistributionState(distributionCount, allDistributors[_distributorID].distributorName,
                                   donations[_donationID].donationName, DistributionState.DistributionCreated);
