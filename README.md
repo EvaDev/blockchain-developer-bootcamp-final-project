@@ -11,6 +11,7 @@ test/: Contains Solidity tests for our smart contracts
         dependency npm install --save-dev chai
         dependency npm install --save-dev @openzeppelin/test-helpers
         dependency npm install --save-dev @openzeppelin/test-environment
+        dependency npm install --save-dev mocha chai
 truffle-config.js: Truffle configuration file
 node_modules/ contains the openzeppelin contracts
         dependency npm install --save-dev @openzeppelin/contracts
@@ -29,19 +30,19 @@ D = Distributions : Links a donation to a list of recipients and can be allocate
 **Simplified workflow on the website**
 1. Donors can
     1. register
-    2. create a donation with
-        2.1. Amount available for distribution, and how many USD per recipient per month they are willing to fund
+    2. create a donation with Amount available for distribution, and how many USD per recipient per month they are willing to fund. $per recipient per month is a rough number since the contract runs int Eth. There is also an admin fee% to pay the distributor for distrubting tokens to recipients.
     3. deposit funds into the donation manager contract under the donor's address
     4. approve or deny funds to be sent to a distributor once conditions are met
     5. get their donation balances
-    6. optionally withdraw any unused funds out of the donor's balance
+    6. change the status of a distributor (To Trusted or UnTrusted).
+    7. optionally withdraw any unused funds out of the donor's balance
 2. Distributors can
     1. register
     2. create a distribution against a donation that has been funded
     3. request the funding from the donation for a specific distribution
     4. withdraw funds from the distributor's balance  
 
-![Screenshot](flow.png)
+![Screenshot](Assets/flow.png)
 
 Run Instructions
 1. in one terminal window
@@ -51,6 +52,7 @@ Run Instructions
 
    to recompile all
    npx truffle compile --all
+  (npx?) truffle compile && mocha --exit --recursive
 
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.

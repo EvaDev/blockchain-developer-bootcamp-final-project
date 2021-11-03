@@ -82,7 +82,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
     uint32 public distributorCount;
     mapping (uint32 => Distributor ) public allDistributors;
     mapping (address => uint256)     internal distributorBalances;
-    event LogDistributorStatus(address indexed distributorAddress, uint32 distributorID,  string distributorName, string distributorStatus);
+    event LogDistributorStatus(address indexed distributorAddress, uint32 distributorID,  string distributorName, DistributorStatus distributorStatus);
     event LogDistributorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
 
     /// @dev Donations
@@ -130,6 +130,11 @@ contract DonationManager is ERC20, Pausable, Ownable {
         require(allDistributors[distributions[_distributionID].distributorID].distributorStatus != DistributorStatus.unTrusted, "Distribution cannot proceed - Distributor untrusted");
         require(donations[distributions[_distributionID].donationID].requestedNotGrantedAmount >= distributions[_distributionID].distributionAmount , "Distribution cannot proceed");
         require(donorBalances[msg.sender] >= distributions[_distributionID].distributionAmount , "Distribution cannot proceed - insufficient funds");
+        _;
+    }
+
+    modifier distributorStatusCanChange(uint32 _distributorID) {
+        require(allDistributors[_distributorID].distributorStatus != DistributorStatus.unTrusted, "Distribution cannot proceed - Distributor untrusted");
         _;
     }
 
@@ -182,7 +187,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
         });
         /// @notice  Set the donation balance to
         distributorBalances[msg.sender] = 0;
-        emit LogDistributorStatus(msg.sender, distributorCount, _distributorName, "New");
+        emit LogDistributorStatus(msg.sender, distributorCount, _distributorName, DistributorStatus.New);
         distributorCount = distributorCount + 1;
         return true;
     }
@@ -230,6 +235,17 @@ contract DonationManager is ERC20, Pausable, Ownable {
       donations[_donationID].donationAmount += _donationAmount;
       donations[_donationID].donationState = DonationState.Funded;
       emit LogDonationState(_donationID, donations[_donationID].donationName, DonationState.Funded);
+    }
+
+    /// @dev Allow the donor to change the status of the distributor to either trusted or untrusted.
+    /// @dev Once set to untrusted it cannot be altered.
+    function changeDistributorStatus(uint32 _distributorID, uint32 _distributorStatus)
+            public isDonor distributorStatusCanChange(_distributorID) {
+      DistributorStatus newDistributorStatus = DistributorStatus(_distributorStatus);
+      allDistributors[_distributorID].distributorStatus = newDistributorStatus;
+      emit LogDistributorStatus(msg.sender, _distributorID,
+                                allDistributors[_distributorID].distributorName,
+                                DistributorStatus(_distributorStatus));
     }
 
     /// @dev Get the balances of a specific donation : Used by the distributor to check what funds are available
