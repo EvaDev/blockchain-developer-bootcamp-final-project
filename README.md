@@ -4,21 +4,9 @@ Nov 2021
 Ethereum address : evadev.eth
 email : robertseanevans@icloud.com
 
-**Directory structure**
-contracts/: Contains the Solidity source files for our smart contracts.
-migrations/: scripts to migrate
-test/: Contains Solidity tests for our smart contracts
-        dependency npm install --save-dev chai
-        dependency npm install --save-dev @openzeppelin/test-helpers
-        dependency npm install --save-dev @openzeppelin/test-environment
-        dependency npm install --save-dev mocha chai
-truffle-config.js: Truffle configuration file
-node_modules/ contains the openzeppelin contracts
-        dependency npm install --save-dev @openzeppelin/contracts
+In South Africa where I live the Covid pandemic has highlighted the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology. There are some simplifying assumptions.
 
-In South Africa where I live the Covid pandemic has highlighted the need to easily and quickly distribute donor funds to worthy / trusted recipients as food tokens. Although a multi faceted problem this project will tackle some aspects of solving the problems using block chain technology given certain simplifying assumptions.
-
-There are 4 main concepts in the donation manager process :
+Donation management concepts :
 A = Donors        : Have funds available and want them to go to the needy
 B = Donations     : A portion of the donor funds with some metadata.
                     A donors can make multiple donations
@@ -44,7 +32,25 @@ D = Distributions : Links a donation to a list of recipients and can be allocate
 
 ![Screenshot](Assets/flow.png)
 
-Run Instructions
+**Directory structure**
+/contracts :    Contains the Solidity source files for our smart contracts.
+/migrations :   scripts to migrate
+/frontEnd   :   contains the react fronnt end app
+/test/:         Contains Solidity tests for our smart contracts
+        dependency npm install --save-dev chai
+        dependency npm install --save-dev @openzeppelin/test-helpers
+        dependency npm install --save-dev @openzeppelin/test-environment
+        dependency npm install --save-dev mocha chai
+/node_modules/  contains the openzeppelin contracts
+        dependency npm install --save-dev @openzeppelin/contracts
+/Instructions : contains      avoiding_common_attacks.md & design_pattern_decisions.md  
+Root Folder
+truffle-config.js: Truffle configuration file
+index.html
+package.json
+README.md
+
+**Run Instructions**
 1. in one terminal window
     npx ganache-cli --deterministic
 2. in a second terminal window
@@ -53,6 +59,9 @@ Run Instructions
    to recompile all
    npx truffle compile --all
   (npx?) truffle compile && mocha --exit --recursive
+
+**Dependencies**
+Tested under Node version 16.3   
 
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.
