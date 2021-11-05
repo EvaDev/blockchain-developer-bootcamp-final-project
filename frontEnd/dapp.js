@@ -7,14 +7,13 @@ const contractAddress = '0xECdE515D91bb1Aa9Af274A260C15c908F4A1852d'
 // const contractABI = build/contracts/DonationManager.json
 // var contractABI = new web3.eth.Contract(contractABI, contractAddress)
 
-//import fs from 'fs';
-// //import fs from './node_modules/fs-extra/fs';
+// import fs from 'fs';
+// // //import fs from './node_modules/fs-extra/fs';
 // var jsonFile = './build/contracts/DonationManager.json';
-// var parsed= JSON.parse(fs.readFileSync(jsonFile));
-// var abi = parsed.abi;
+// var parsed = JSON.parse(fs.readFileSync(jsonFile));
+// var contractABI = parsed.abi;
 
-// import contractJSON from '../build/contracts/DonationManager.json';
-// var contractABI = new web3.eth.Contract(contractJSON.abi, contractAddress);
+import contractJSON from '../build/contracts/DonationManager.json';
 
 window.addEventListener('load', function() {
 
@@ -62,7 +61,7 @@ mmEnable.onclick = async () => {
   var accounts = await web3.eth.getAccounts();
   const bal = await web3.eth.getBalance(accounts[0]);
   console.log('balance = : ', await web3.eth.getBalance(accounts[0]));
-  console.log(bal);
+  //console.log(bal);
   // grab mm-current-account
   // and populate it with the current address
   var mmCurrentAccount = document.getElementById('mm-current-account');
@@ -74,22 +73,26 @@ mmEnable.onclick = async () => {
 
 // grab the button for input to a contract:
 
-const ssSubmit = document.getElementById('ss-input-button');
+const ssSubmit = document.getElementById('addDonor');
 
 ssSubmit.onclick = async () => {
-  // grab value from input
+  // grab donor Name
 
-  const ssInputValue = document.getElementById('ss-input-box').value;
+  const ssInputValue = document.getElementById('inputDonorName').value;
   console.log(ssInputValue)
 
-  var web3 = new Web3(window.ethereum)
+  var web3 = await new Web3(window.ethereum)
 
   // instantiate smart contract instance
+  //var contractABI = new web3.eth.Contract(contractJSON.abi, contractAddress);
 
-  const simpleStorage = new web3.eth.Contract(contractABI, contractAddress)
-  simpleStorage.setProvider(window.ethereum)
+  console.log(bal);
+  console.log(contractABI);
 
-  await simpleStorage.methods.store(ssInputValue).send({from: ethereum.selectedAddress})
+  const dm = new web3.eth.Contract(contractABI, contractAddress)
+  dm.setProvider(window.ethereum)
+
+  await dm.methods.createDonor(ssInputValue,bal).send({from: ethereum.selectedAddress})
 
 }
 
