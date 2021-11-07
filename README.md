@@ -54,14 +54,35 @@ README.md
 1. in one terminal window
     npx ganache-cli --deterministic
 2. in a second terminal window
-   npx truffle migrate --network development
+   truffle test
 
    to recompile all
    npx truffle compile --all
   (npx?) truffle compile && mocha --exit --recursive
 
 **Dependencies**
-Tested under Node version 16.3   
+These are the commands I ran for my project
+npm init -y
+node v16.13.0
+npm install --save-dev truffle
+npx truffle init
+create contract , Update truffle-config for compiler version
+create the deployment file
+npm install --save-dev chai
+npm install --save-dev @openzeppelin/test-helpers
+npm install --save-dev @openzeppelin/test-environment
+npm install --save-dev mocha chai
+npm install --save-dev @openzeppelin/contracts
+npm install -g truffle-expect truffle-config web3
+npx truffle compile
+Create the test file
+truffle test — show-events
+npx truffle migrate --network development
+npm install -g truffle-abi     (For just generating ABI)
+truffle-abi
+npm install -g solc
+create front end 
+npx http server  
 
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.

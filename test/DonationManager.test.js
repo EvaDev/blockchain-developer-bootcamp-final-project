@@ -4,7 +4,7 @@ const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 // Load compiled artifacts
 const DonationManager = artifacts.require('DonationManager');
 //const DonationManager = contract.fromArtifact('DonationManager');
-const truffleAssert = require('truffle-assertions');
+//const truffleAssert = require('truffle-assertions');
 
 contract('DonationManager', (accounts) => {
       let donationManager;

@@ -103,8 +103,10 @@ contract DonationManager is ERC20, Pausable, Ownable {
     }
 
     /// @dev A distributor cannot become a donor
+    /// @dev A donor can only be added once
     modifier onlyDonor() {
         require(distributorBalances[msg.sender] == 0 , "cannot be called by distributors." );
+        require(donorBalances[msg.sender] == 0 , "cannot create another donor for this account." );
         _;
     }
 
