@@ -62,26 +62,47 @@ README.md
 
 **Dependencies**
 These are the commands I ran for my project
+
 npm init -y
+
 node v16.13.0
+
 npm install --save-dev truffle
+
 npx truffle init
+
 create contract , Update truffle-config for compiler version
+
 create the deployment file
+
 npm install --save-dev chai
+
 npm install --save-dev @openzeppelin/test-helpers
+
 npm install --save-dev @openzeppelin/test-environment
+
 npm install --save-dev mocha chai
+
 npm install --save-dev @openzeppelin/contracts
+
 npm install -g truffle-expect truffle-config web3
+
 npx truffle compile
+
 Create the test file
+
 truffle test — show-events
+
 npx truffle migrate --network development
+
 npm install -g truffle-abi     (For just generating ABI)
+
 truffle-abi
+
 npm install -g solc
-create front end 
+
+create front end
+
 npx http server  
 
 **Simplifying assumptions:**
