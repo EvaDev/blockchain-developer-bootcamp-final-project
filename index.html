@@ -14,21 +14,21 @@
 
   <div class="split left">
     <div class="centered">
-
+      <div class = "Metamask" >
+        <button id="mm-connect">Connect to MetaMask</button>
+        <div id="mm-current-account"></div>         <div id="mmMessage"></div>
+        <div id="mm-current-balance"></div>
+        <div id="donor-connection"></div>
+      </div>
       <div class = "donor" >
         <h2 id="donorheader" </h2>
       </div>
-      <div class = "Metamask" >
-        <button id="mm-connect">Connect to MetaMask</button>
-        <div id="mm-current-account"></div>
-        <div id="mm-current-balance"></div>
-        <div id="mm-connection"></div>
-        <div id="donatedTotal"></div>
-        <div id="grantedTotal"></div>
-        <div id="notGrantedTotal"></div>
-        <div id="withdrawlTotal"></div>
-      </div>
-        <label> Donor Name
+      <div id="donatedTotal"></div>
+      <!-- <div id="grantedTotal"></div>
+      <div id="notGrantedTotal"></div>
+      <div id="withdrawlTotal"></div> -->
+
+      <label> Donor Name
           <input id="inputDonorName" type="string" placeholder="Input Donor Name"/>
         </label>
         <button id="addDonor">Add Donor</button>
@@ -36,12 +36,18 @@
         <div class = "donation" >
           <h2 id="donationheader" </h2>
         </div>
+        <div class="scrollit">
+          <table>
+          </table>
+        </div>
+        <br></br>
+
         <label> Donation Name
           <input id="inputDonationName" type="string" placeholder="Donation Name"/>
         </label>
 
-        <label> USD per day
-          <input id="inputUSDpd" type="number" value = 40 placeholder="USD per Day"/>
+        <label> USD per month
+          <input id="inputUSDpm" type="number" value = 40 placeholder="USD per Month"/>
         </label>
 
         <label> Admin Fee%
@@ -55,11 +61,6 @@
           </select>
         </label>
         <button id="addDonation"  >Add Donation</button>
-        <div class="scrollit">
-          <table>
-          </table>
-        </div>
-        <br></br>
         <label>  Donation ID
           <input id="inputDonationID" type="number"  placeholder="Donation ID"/>
         </label>
@@ -74,8 +75,8 @@
   <div class="split right">
     <div class="centered">
       <br></br>
-      <br></br>
-      <br></br>
+
+      <div id="distributor-connection"></div>
 
       <div class = "distributor" >
         <h2 id="distributorheader" </h2>
@@ -108,7 +109,7 @@
       <h2 id="distributionheader" </h2>
       </div>
       <label> Donation ID
-        <input id="inputDonationID" type="string" placeholder="Donation ID"/>
+        <input id="inputDonID" type="string" placeholder="Donation ID"/>
       </label>
 
       <label> Recipients

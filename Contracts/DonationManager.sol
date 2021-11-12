@@ -270,6 +270,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
       uint256  _donatedAmount = 0;
       uint256  _grantedAmount = 0;
       uint256  _requestedNotGranted = 0;
+      uint256  _fundsAvailableToWithdraw = donorBalances[msg.sender];
       for (uint32 i = 0; i < donations.length; i++) {
             if (donations[i].donorID == _donorID) {
                 _donatedAmount += _donatedAmount;
@@ -277,7 +278,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
                 _requestedNotGranted += _requestedNotGranted;
             }
       }
-      return (_donatedAmount,_grantedAmount,_requestedNotGranted,donorBalances[msg.sender] );
+      return (_donatedAmount,_grantedAmount,_requestedNotGranted,_fundsAvailableToWithdraw );
     }
 
     /// @dev Get the balances of the ddistributor across all distributions
@@ -331,7 +332,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
                                  DistributionState.FundsApproved);
       emit LogDonationState(distributions[_distributionID].donationID,
                             donations[distributions[_distributionID].donationID].donationName,
-                            DonationState.Funded);
+                            DonationState.Distributing);
       address distAddr = payable(allDistributors[distributions[_distributionID].distributorID].distributorAddress);
       uint256 distrAmt = distributions[_distributionID].distributionAmount;
       /// @notice Check that this is actually seding from donor to distributor
