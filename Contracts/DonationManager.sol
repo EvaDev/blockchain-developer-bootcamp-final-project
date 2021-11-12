@@ -196,7 +196,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
 
     /// @dev Create a new Donation. It can only be created by donors
     function createDonation(string memory _donationName, uint32  _donorID,
-        uint32  _USDperRecipientPerMonth, uint8  _adminFeePercent, uint32 _donationPurpose)
+        uint32  _USDperRecipientPerMonth, uint8  _adminFeePercent)
         public isDonor returns ( bool ) {
 
         Donation memory currentDonation;
@@ -264,8 +264,9 @@ contract DonationManager is ERC20, Pausable, Ownable {
     /// @return grantedAmount Distributed Amount - funds actually sent to distributor
     /// @return requestedNotGranted Requested amount but not approved
     /// @return fundsAvailableToWithdraw Funds available to withdraw
-    function getDonorBalance(uint32 _donorID)  private isDonor view
-        returns (uint256 donatedAmount, uint256 grantedAmount, uint256 requestedNotGranted, uint256 fundsAvailableToWithdraw) {
+    function getAllDonorBalances(uint32 _donorID)  public isDonor view
+        returns (uint256 donatedAmount, uint256 grantedAmount, uint256 requestedNotGranted,
+        uint256 fundsAvailableToWithdraw) {
       uint256  _donatedAmount = 0;
       uint256  _grantedAmount = 0;
       uint256  _requestedNotGranted = 0;
@@ -338,7 +339,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
       require(sent, "Failed to send funds to the distributor");
     }
 
-    // Allow the donor to withdraw funds balance provided there are no distributions that have submitted funding requests
+    /// @dev Allow the donor to withdraw funds balance provided there are no distributions that have submitted funding requests
     function donorWithdrawal(uint256 _withdrawAmount, uint32 _donorID) public payable isDonor distributionsAreUpToDate (_donorID) {
       require(donorBalances[msg.sender] >= _withdrawAmount, "Withdrawal request exceeds donor balance");
       donorBalances[msg.sender] -= _withdrawAmount;
@@ -348,7 +349,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
       require(sent, "Failed to withdraw funds to the donor");
     }
 
-    // Allow the distributor to withdraw funds balance
+    /// @dev Allow the distributor to withdraw funds balance
     function distributorWithdrawal(uint _withdrawAmount) public payable isDistributor  {
       require(distributorBalances[msg.sender] >= _withdrawAmount, "Withdrawal request exceeds balance");
       distributorBalances[msg.sender] -= _withdrawAmount;

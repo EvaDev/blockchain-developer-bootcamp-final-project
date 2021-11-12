@@ -15,35 +15,39 @@
   <div class="split left">
     <div class="centered">
 
+      <div class = "donor" >
+        <h2 id="donorheader" </h2>
+      </div>
       <div class = "Metamask" >
         <button id="mm-connect">Connect to MetaMask</button>
         <div id="mm-current-account"></div>
         <div id="mm-current-balance"></div>
         <div id="mm-connection"></div>
+        <div id="donatedTotal"></div>
+        <div id="grantedTotal"></div>
+        <div id="notGrantedTotal"></div>
+        <div id="withdrawlTotal"></div>
       </div>
-      <div class = "donor" >
-        <h2 id="donorheader" </h2>   
-      </div>
-        <label> Donor Name 
-          <input id="inputDonorName" type="string" placeholder="Input Donor Name"/> 
+        <label> Donor Name
+          <input id="inputDonorName" type="string" placeholder="Input Donor Name"/>
         </label>
         <button id="addDonor">Add Donor</button>
 
         <div class = "donation" >
-          <h2 id="donationheader" </h2>  
-        </div> 
-        <label> Donation Name 
-          <input id="inputDonationName" type="string" placeholder="Donation Name"/>    
+          <h2 id="donationheader" </h2>
+        </div>
+        <label> Donation Name
+          <input id="inputDonationName" type="string" placeholder="Donation Name"/>
         </label>
-          
-        <label> USD per day 
+
+        <label> USD per day
           <input id="inputUSDpd" type="number" value = 40 placeholder="USD per Day"/>
         </label>
 
-        <label> Admin Fee% 
-          <input id="inputFeePct" type="number" value = 5 placeholder="Fee Percent"/>            
+        <label> Admin Fee%
+          <input id="inputFeePct" type="number" value = 5 placeholder="Fee Percent"/>
         </label>
-        <label> Purpose 
+        <label> Purpose
           <select purpose = "dropdown">
             <option value = "FoodTokens" selected>FoodTokens</option>
             <option value = "Hospital">Hospital</option>
@@ -57,10 +61,10 @@
         </div>
         <br></br>
         <label>  Donation ID
-          <input id="inputDonationID" type="number"  placeholder="Donation ID"/>            
+          <input id="inputDonationID" type="number"  placeholder="Donation ID"/>
         </label>
         <label>  Donation amount
-          <input id="inputDonationAmount" type="number" value = 10 placeholder="Donation Amount"/>            
+          <input id="inputDonationAmount" type="number" value = 10 placeholder="Donation Amount"/>
         </label>
         <button id="makeDonation"  >Donate Funds</button>
 
@@ -74,13 +78,13 @@
       <br></br>
 
       <div class = "distributor" >
-        <h2 id="distributorheader" </h2>   
-      </div> 
-      <label> Distributor Name 
-        <input id="inputDistributorName" type="string" placeholder="Input Distributor Name"/> 
+        <h2 id="distributorheader" </h2>
+      </div>
+      <label> Distributor Name
+        <input id="inputDistributorName" type="string" placeholder="Input Distributor Name"/>
       </label>
 
-      <label> Country   
+      <label> Country
         <select id="inputDistributorCountry">
         <option value="AF">Afghanistan</option>
         <option value="AX">Åland Islands</option>
@@ -101,18 +105,18 @@
       <button id="addDistributor">Add Distributor</button>
 
       <div class = "distribution" >
-      <h2 id="distributionheader" </h2>   
-      </div> 
-      <label> Donation ID 
-        <input id="inputDonationID" type="string" placeholder="Donation ID"/>    
+      <h2 id="distributionheader" </h2>
+      </div>
+      <label> Donation ID
+        <input id="inputDonationID" type="string" placeholder="Donation ID"/>
       </label>
-        
-      <label> Recipients 
+
+      <label> Recipients
         <input id="inputRecipients" type="number" value = 500 placeholder="Recipients"/>
       </label>
 
-      <label> Months 
-        <input id="inputMonths" type="number" value = 1 placeholder="Months"/>            
+      <label> Months
+        <input id="inputMonths" type="number" value = 1 placeholder="Months"/>
       </label>
       <button id="addDistribution"  >Add Distribution</button>
 

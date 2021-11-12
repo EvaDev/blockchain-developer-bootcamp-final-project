@@ -437,7 +437,42 @@ const contractABI = [  {
     "stateMutability": "view",
     "type": "function",
     "constant": true
-  },]
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_donorID",
+        "type": "uint32"
+      }
+    ],
+    "name": "getAllDonorBalances",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "donatedAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "grantedAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "requestedNotGranted",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "fundsAvailableToWithdraw",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+]
 
 //import fs from 'fs';
 //var fs = require('fs');
@@ -547,7 +582,8 @@ const getDonationDetails = async function () {
       } catch (e) {
         console.log('Problem getting distributionStruct ' )
       }    
-    }}
+    }
+  }
 
 function generateTableHead(table, data) {
   let thead = table.createTHead();
@@ -739,6 +775,7 @@ mmEnableButton.onclick = async () => {
       connectedAs.innerHTML = 'Connected as Donor: ' + donorStruct.donorName + ' ID ' + donorStruct.donorID;
       addDonation.disabled = false;
       currentDonorID = donorStruct.donorID;
+      getDonationDetails()
     }     
   }
   if (currentDonorID = -1) {
@@ -748,9 +785,11 @@ mmEnableButton.onclick = async () => {
       if (distribStruct.distributorAddress.toUpperCase() == ethereum.selectedAddress.toUpperCase()) {
         console.log('Got a match: ' + distribStruct.distributorAddress + ' ' + distribStruct.distributorName+ ' ' + distribStruct.distributorID)
         let connectedAs = document.getElementById('mm-connection');
-        connectedAs.innerHTML = 'Connected as Distributor: ' + distribStruct.donorName + ' ID ' + distribStruct.distributorID;
         addDistribution.disabled = false;
         currentDistributorID = distribStruct.distributorID;
+        connectedAs.innerHTML = 'Connected as Distributor: ' + distribStruct.donorName + ' ID ' + 
+                        distribStruct.distributorID + 'Balance: ' + await web3.eth.getBalance(accounts[0]);
+        //getDistributorDetails()
       }     
     }    
   }
@@ -761,21 +800,36 @@ mmEnableButton.onclick = async () => {
 }
 
 // get current donors and populate table
-// const getDonations = document.getElementById('getDonations')
-// getDonations.onclick = async () => {
-//   var web3 = new Web3(window.ethereum)
-//   const dm = new web3.eth.Contract(contractABI, contractAddress)
-//   dm.setProvider(window.ethereum)
-//   var donorStruct = await dm.methods.allDonors(0).call()
-//   console.log('Got Here: ' + donorStruct.donorID)
+const getDonationDetails = async function () {
+  const donatedTotal = document.getElementById('donatedTotal')
+  const grantedTotal = document.getElementById('grantedTotal')
+  const notGrantedTotal = document.getElementById('notGrantedTotal')
+  const withdrawlTotal = document.getElementById('withDrawlTotal')
+  var web3 = new Web3(window.ethereum)
+  const dm = new web3.eth.Contract(contractABI, contractAddress)
+  dm.setProvider(window.ethereum)
+  let donorBalances = await dm.methods.getAllDonorBalances(currentDonorID).call()
+  donatedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.donatedTotal
+  grantedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.grantedTotal
+  notGrantedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.notGrantedTotal
+  withdrawlTotal.innerHTML = 'Connected as Donor: ' + donorBalances.withdrawlTotal
+}
 
-//   for (let x = 0; x < donorStruct.count; x ++) {
-//     if donorStruct[x].
-//     const connectedAs = document.getElementById('mm-connection')
-//     connectedAs.innerHTML = 'Connected as Donor: ' + donorStruct.donorName
-//   }
-// }
-
+/* get current distributor and populate table
+const getDistributorDetails = async function () {
+  const donatedTotal = document.getElementById('donatedTotal')
+  const grantedTotal = document.getElementById('grantedTotal')
+  const notGrantedTotal = document.getElementById('notGrantedTotal')
+  const withdrawlTotal = document.getElementById('withDrawlTotal')
+  var web3 = new Web3(window.ethereum)
+  const dm = new web3.eth.Contract(contractABI, contractAddress)
+  dm.setProvider(window.ethereum)
+  let donorBalances = await dm.methods.getAllDonorBalances(currentDonorID).call()
+  donatedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.donatedTotal
+  grantedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.grantedTotal
+  notGrantedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.notGrantedTotal
+  withdrawlTotal.innerHTML = 'Connected as Donor: ' + donorBalances.withdrawlTotal
+}*/
 // Add a donor:
 addDonor.onclick = async () => {
   const donorName = document.getElementById('inputDonorName').value;

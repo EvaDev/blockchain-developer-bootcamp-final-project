@@ -18,16 +18,17 @@ D = Distributions : Links a donation to a list of recipients and can be allocate
 **Simplified workflow on the website**
 1. Donors can
     1. register
-    2. create a donation with Amount available for distribution, and how many USD per recipient per month they are willing to fund. $per recipient per month is a rough number since the contract runs int Eth. There is also an admin fee% to pay the distributor for distrubting tokens to recipients.
+    2. create a donation with the amount available for distribution, and how many USD per recipient per month they are willing to fund. $per recipient per month is a rough number since the contract runs int Eth. There is also gas and an admin fee% to pay the distributor for distrubting tokens to recipients.
     3. deposit funds into the donation manager contract under the donor's address
-    4. approve or deny funds to be sent to a distributor once conditions are met
-    5. get their donation balances
+    4. approve or deny funds requested by a distributor once conditions are met
+    5. get the donor's donation balances
     6. change the status of a distributor (To Trusted or UnTrusted).
-    7. optionally withdraw any unused funds out of the donor's balance
+    7. optionally withdraw any unused funds out of the donor's balance provided these are not earmarked for distribution
 2. Distributors can
     1. register
-    2. create a distribution against a donation that has been funded
-    3. request the funding from the donation for a specific distribution
+    2. create a distribution against a donation that has been funded (i.e. not just created, it must have funds)
+    3. request funding from the donation for a specific distribution. Provided certain conditions are met (eg the recipients file is valid)
+    this distribution will move into status 'FundsRequested' to be approved or denied by the donor.
     4. withdraw funds from the distributor's balance  
 
 ![Screenshot](Assets/flow.png)
@@ -71,9 +72,9 @@ npm install --save-dev truffle
 
 npx truffle init
 
-create contract , Update truffle-config for compiler version
-
-create the deployment file
+create contract /Contracts/DonationManager.sol
+Update truffle-config for compiler version
+create the deployment file /migrations/2_deploy_contracts.js
 
 npm install --save-dev chai
 
@@ -89,8 +90,9 @@ npm install -g truffle-expect truffle-config web3
 
 npx truffle compile
 
-Create the test file
-
+Create the test file /test/DonationManager.test.js
+For testing use Ganache set up on port 8545 network ID 1337
+To run the tests run this :
 truffle test — show-events
 
 npx truffle migrate --network development

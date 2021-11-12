@@ -22,7 +22,7 @@ contract('DonationManager', (accounts) => {
         // Set Distributor balance to zero
         //await donationManager.transfer(fundingAccount, eth10.toString(), { from: distributorX });
         await donationManager.createDistributor("DistributorX", "South Africa", {from: distributorX } );
-        await donationManager.createDonation("Donation A1", 0, 40, 5, 0, {from: donorA } );
+        await donationManager.createDonation("Donation A1", 0, 40, 5, {from: donorA } );
         //await donationManager.donorDeposit(toBN(eth10), {from: donorA } );
         await donationManager.makeDonation( toBN(eth10), 0, {from: donorA } );
         await donationManager.createDistribution(0, 0, 500, 1, true, {from: distributorX } );
