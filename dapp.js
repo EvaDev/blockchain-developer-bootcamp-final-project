@@ -710,7 +710,7 @@ function generateTableHead(table, data) {
     } 
     if (key == 'donationState') {
       let th = document.createElement("th");
-      let text = document.createTextNode('State');
+      let text = document.createTextNode('Donation Status');
       th.appendChild(text);
       row.appendChild(th);  
     } 
@@ -734,7 +734,6 @@ function generateTable(table, data) {
       if (key == 'donationAmount')  {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]/1e18);
-//        let text = document.createTextNode(element[key]);
         cell.appendChild(text);
       }
       if (key == 'donationGrantedAmount') {
@@ -760,6 +759,10 @@ function generateTable(table, data) {
       if (key == 'donationState') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
+        console.log('Text' + text.nodeValue)
+        if (text.nodeValue == 0) {text.nodeValue = 'Created';  }
+        if (text.nodeValue == 1) {text.nodeValue = 'Funded';  }
+        if (text.nodeValue == 2) {text.nodeValue = 'Distributing';  }
         cell.appendChild(text);
       } 
     }
@@ -806,6 +809,12 @@ function generateDistTableHead(table, data) {
       th.appendChild(text);
       row.appendChild(th);  
     } 
+    if (key == 'distributionState') {
+      let th = document.createElement("th");
+      let text = document.createTextNode('Distribution Status');
+      th.appendChild(text);
+      row.appendChild(th);  
+    }
   }
 }
 
@@ -842,6 +851,15 @@ function generateDistTable(table, data) {
         let text = document.createTextNode(element[key]);
         cell.appendChild(text);
       } 
+      if (key == 'distributionState') {
+        let cell = row.insertCell();
+        let text = document.createTextNode(element[key]);
+        if (text.nodeValue == 0) {text.nodeValue = 'Created';  }
+        if (text.nodeValue == 1) {text.nodeValue = 'Requested';  }
+        if (text.nodeValue == 2) {text.nodeValue = 'Approved';  }
+        if (text.nodeValue == 3) {text.nodeValue = 'NOT Approved';  }
+        cell.appendChild(text);
+      } 
     }
   }
 }
@@ -865,10 +883,11 @@ const refreshPageFunction = async function ()  {
   let accounts = await web3.eth.getAccounts();
   showBalance = await web3.eth.getBalance(accounts[0])/1e18;
   console.log('balance = : ', await web3.eth.getBalance(accounts[0]));
-  // let mmCurrentAccount = document.getElementById('mm-current-account');
-  // mmCurrentAccount.innerHTML = 'Current Account: ' + ethereum.selectedAddress
-  // let mmCurrentBalance = document.getElementById('mm-current-balance');
-  // mmCurrentBalance.innerHTML = 'Current Balance: ' + bal
+
+  let connectedAsDonor       = document.getElementById('donor-connection');
+  let connectedAsDistributor = document.getElementById('distributor-connection');
+  connectedAsDonor.innerHTML = ''
+  connectedAsDistributor.innerHTML = ''
   isConnectedToMM = true
   // Check who we are connected as - it could be a donor or distributor or neither (unregistered)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
@@ -880,8 +899,7 @@ const refreshPageFunction = async function ()  {
     if (donorStruct.donorAddress.toUpperCase() == ethereum.selectedAddress.toUpperCase()) {
       donorName             = donorStruct.donorName
       console.log('Got a match: ' + donorStruct.donorAddress + ' ' + donorStruct.donorName+ ' ' + donorStruct.donorID)
-      let connectedAs = document.getElementById('donor-connection');
-      connectedAs.innerHTML = 'Connected as Donor: ' + donorStruct.donorName + ' ID ' + donorStruct.donorID;
+      connectedAsDonor.innerHTML = 'Connected as Donor: ' + donorStruct.donorName + ' ID ' + donorStruct.donorID;
       currentDonorID = donorStruct.donorID;
       getDonorBalances()
     }     
@@ -893,12 +911,14 @@ const refreshPageFunction = async function ()  {
       //console.log('match? ' + distribStruct.distributorAddress + ' ' + ethereum.selectedAddress.toUpperCase())
       if (distribStruct.distributorAddress.toUpperCase() == ethereum.selectedAddress.toUpperCase()) {
         //console.log('Got a match: ' + distribStruct.distributorAddress + ' ' + distribStruct.distributorName+ ' ' + distribStruct.distributorID)
-        let connectedAs = document.getElementById('distributor-connection');
         currentDistributorID = distribStruct.distributorID;
         distributorName       = distribStruct.distributorName;
-        connectedAs.innerHTML = 'Connected as Distributor: ' + distribStruct.distributorName + ' ID ' + 
-                        distribStruct.distributorID + '  Country: ' + distribStruct.distributorCountry + 
-                        '  Status: ' + distribStruct.distributorStatus;
+        let status = 'NEW';
+        if (distribStruct.distributorStatus == 1) {status = 'UNTrusted'} ;
+        if (distribStruct.distributorStatus == 2) {status = 'Trusted'} ;
+        connectedAsDistributor.innerHTML = 'Connected as Distributor: ' + distribStruct.distributorName + '     ID ' + 
+                        distribStruct.distributorID + '      Country: ' + distribStruct.distributorCountry + 
+                        '      Status:   ' + status;
       }     
     }    
   }
@@ -971,22 +991,6 @@ const getDonorBalances = async function () {
   // notGrantedTotal.innerHTML = 'Not Granted : ' + donorBalances.requestedNotGranted
   //withdrawlTotal.innerHTML  = 'Available to withdraw: ' + donorBalances.fundsAvailableToWithdraw
 }
-
-/* get current distributor and populate table
-const getDistributorDetails = async function () {
-  const donatedTotal = document.getElementById('donatedTotal')
-  const grantedTotal = document.getElementById('grantedTotal')
-  const notGrantedTotal = document.getElementById('notGrantedTotal')
-  const withdrawlTotal = document.getElementById('withDrawlTotal')
-  var web3 = new Web3(window.ethereum)
-  const dm = new web3.eth.Contract(contractABI, contractAddress)
-  dm.setProvider(window.ethereum)
-  let donorBalances = await dm.methods.getAllDonorBalances(currentDonorID).call()
-  donatedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.donatedTotal
-  grantedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.grantedTotal
-  notGrantedTotal.innerHTML = 'Connected as Donor: ' + donorBalances.notGrantedTotal
-  withdrawlTotal.innerHTML = 'Connected as Donor: ' + donorBalances.withdrawlTotal
-}*/
 
 // Add a donor:
 addDonor.onclick = async () => {
@@ -1061,7 +1065,7 @@ addDistribution.onclick = async () => {
       distMessages.innerHTML = 'Distribution Added Successfully'
       refreshPageFunction()
     } catch (e) {
-      distMessages.innerHTML = 'Distribution cannot be added - check that donation has sufficient funds.'
+      distMessages.innerHTML = 'Distribution cannot be added - check that donation is funded and has sufficient funds.'
         console.log('Message ' + e.message )
         console.log('Code ' + e.code )
 //        console.log('Reason ' + e.reason )
@@ -1077,9 +1081,9 @@ approveDistribution.onclick = async () => {
   dm.setProvider(window.ethereum)
   if (currentDonorID >= 0) {
     try { 
+      console.log('Input DID ' + inputDistributionID + ' _ ' + currentDonorID )
       await dm.methods.requestDonationFunds(inputDistributionID, currentDonorID).send({from: ethereum.selectedAddress})
       refreshPageFunction()
-
     } catch (e) {
         console.log('Message ' + e.message )
         console.log('Code ' + e.code )
