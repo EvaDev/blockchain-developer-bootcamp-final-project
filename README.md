@@ -33,6 +33,8 @@ D = Distributions : Links a donation to a list of recipients and can be allocate
 
 ![Screenshot](Assets/flow.png)
 
+![Screenshot](Assets/model.png)
+
 **Directory structure**
 /contracts :    Contains the Solidity source files for our smart contracts.  
 /migrations :   scripts to migrate  
