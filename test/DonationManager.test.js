@@ -11,6 +11,7 @@ contract('DonationManager', (accounts) => {
       const [contractOwner, donorA, distributorX, donorB, distributorY, fundingAccount] = accounts;
       const eth100 = 100e18;
       const eth10  = 10e18;
+      const eth01  = 1e16;
       const toBN = web3.utils.toBN;
       const eth10String = 10e18.toString();
 
@@ -22,9 +23,9 @@ contract('DonationManager', (accounts) => {
         // Set Distributor balance to zero
         //await donationManager.transfer(fundingAccount, eth10.toString(), { from: distributorX });
         await donationManager.createDistributor("DistributorX", "South Africa", {from: distributorX } );
-        await donationManager.createDonation("Donation A1", 0, 40, 5, {from: donorA } );
+        await donationManager.createDonation("Donation A1", 0, toBN(eth01), 5, {from: donorA } );
         //await donationManager.donorDeposit(toBN(eth10), {from: donorA } );
-        await donationManager.makeDonation( toBN(eth10), 0, {from: donorA } );
+        await donationManager.makeDonation( toBN(eth10), 0, 0, {from: donorA } );
         await donationManager.createDistribution(0, 0, 500, 1, true, {from: distributorX } );
       });
 
@@ -50,7 +51,7 @@ contract('DonationManager', (accounts) => {
         const donationStruct = await donationManager.donations.call(0);
         console.log ('Donation A1 Start amount ', web3.utils.fromWei(donationStruct.donationAmount.toString(),'ether'));
         //console.log ('Donation A1 USD/Recipient/Month ', donationStruct.USDperRecipientPerMonth.toString());
-        expect(donationStruct.USDperRecipientPerMonth.toString()).to.equal('40');
+        expect(donationStruct.USDperRecipientPerMonth.toString()).to.equal('10000000000000000');
         expect(donationStruct.donationName.toString()).to.equal('Donation A1');
         expect(donorStruct.amountDonated.toString()).to.equal('10000000000000000000');
         expect(donationStruct.donationAmount.toString()).to.equal('10000000000000000000');
@@ -60,8 +61,17 @@ contract('DonationManager', (accounts) => {
         //console.log ('Distribution X1 A1 ', distributionStruct);
         expect((await donationManager.distributionCount()).toString()).to.equal('1');
         //expect((await this.donationManager.donorBalances(donorA)).toString()).to.equal('0');
-        expect(distributionStruct.distributionAmount.toString()).to.equal('20000');
+        expect(distributionStruct.distributionAmount.toString()).to.equal('5000000000000000000');
       });
+      it('Check Donor B cannot donate to Donor As donation ', async function () {
+        await expectRevert.unspecified(
+          donationManager.makeDonation( toBN(eth10), 0, 0, {from: donorB } ), '');
+          //'This function is restricted to donors.');
+//          'Donation does not belong to this donor');
+      });
+
+      // New test : Check that distributor cannot claim amount > donated amount, even if donor actual balance is higher
+
     });
 
 /*describe('DonationManager as donor A', function() {

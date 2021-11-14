@@ -9,6 +9,10 @@ table { background-color: #000; }
 tr { background-color: #a0bff2; }
 td { background-color: white; }
 
+dist_table { background-color: #000; }
+dist_tr { background-color: #a0bff2; }
+dist_td { background-color: white; }
+
 .split {
   height: 100%;
   width: 50%;
@@ -47,6 +51,14 @@ button {
  padding: 1em 4em;
  display:block;
 }
+
+/* .buttons {
+  margin: 5px;
+  background-color: #e5f5bf;
+  padding: 1em 4em;
+  display: inline-block;
+} */
+
 #displayDonorName {
  padding:1em;
  background-color:#fff;

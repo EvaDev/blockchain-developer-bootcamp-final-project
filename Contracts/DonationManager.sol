@@ -47,7 +47,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
        uint256      donationAmount;
        uint256      donationGrantedAmount;
        uint256      requestedNotGrantedAmount;
-       uint32       USDperRecipientPerMonth;
+       uint256      USDperRecipientPerMonth;
        uint8        adminFeePercent;
        DonationState    donationState;
        DonationPurpose  donationPurpose;
@@ -102,6 +102,12 @@ contract DonationManager is ERC20, Pausable, Ownable {
         _;
     }
 
+    /// @dev check that this is the donor of this donation
+    // modifier isTheDonorOf(uint32 _donorID, uint32 _donationID) {
+    //     require(donations[_donorID]. >= 0, "This function is restricted to donors." );
+    //     _;
+    // }
+
     /// @dev A distributor cannot become a donor
     /// @dev A donor can only be added once
     modifier onlyDonor() {
@@ -125,9 +131,10 @@ contract DonationManager is ERC20, Pausable, Ownable {
     /// @dev If the distributorStatus is new they cannot request funding for more than 1000 recipients
     /// @dev The donation must have sufficient funds for the distribution
     /// @dev The distribution list must be valid (outside the scope of this project)
-    modifier distributionCanProceed(uint32 _distributionID) {
+    modifier distributionCanProceed(uint32 _distributionID, uint32 _donorID) {
         require(distributions[_distributionID].distributionAmount >= 0 , "Distribution cannot proceed - Distribution amount is <= 0");
         require(distributions[_distributionID].recipientDetailsAreValid , "Distribution cannot proceed - Distribution list is invlid");
+        require(distributions[_distributionID].donorID == _donorID , "Distribution cannot proceed - Distribution is not for this donor");
         require(distributions[_distributionID].distributionState == DistributionState.FundsRequested, "Distribution cannot proceed status is not funds requested");
         require(allDistributors[distributions[_distributionID].distributorID].distributorStatus != DistributorStatus.unTrusted, "Distribution cannot proceed - Distributor untrusted");
         require(donations[distributions[_distributionID].donationID].requestedNotGrantedAmount >= distributions[_distributionID].distributionAmount , "Distribution cannot proceed");
@@ -187,7 +194,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
             distributorCountry  : _distributorCountry,
             distributorStatus   : DistributorStatus.New
         });
-        /// @notice  Set the donation balance to
+        /// @notice  Set the distributor's balance to
         distributorBalances[msg.sender] = 0;
         emit LogDistributorStatus(msg.sender, distributorCount, _distributorName, DistributorStatus.New);
         distributorCount = distributorCount + 1;
@@ -196,7 +203,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
 
     /// @dev Create a new Donation. It can only be created by donors
     function createDonation(string memory _donationName, uint32  _donorID,
-        uint32  _USDperRecipientPerMonth, uint8  _adminFeePercent)
+        uint256  _USDperRecipientPerMonth, uint8  _adminFeePercent)
         public isDonor returns ( bool ) {
 
         Donation memory currentDonation;
@@ -230,8 +237,9 @@ contract DonationManager is ERC20, Pausable, Ownable {
     }
 
     /// @dev Allow the donor to ring fence funds for a donation. No actual transfer of funds.
-    function makeDonation(uint256 _donationAmount, uint32 _donationID) public isDonor  {
+    function makeDonation(uint256 _donationAmount, uint32 _donationID, uint32 _donorID) public isDonor  {
       require((donorBalances[msg.sender] - allDonors[_donationID].amountDonated) >= _donationAmount, "Donation amount exceeds donor available balance");
+      require(donations[_donationID].donorID  == _donorID, "Donation does not belong to this donor");
       uint32 donorID = donations[_donationID].donorID;
       allDonors[donorID].amountDonated += _donationAmount;
       donations[_donationID].donationAmount += _donationAmount;
@@ -292,7 +300,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
                                 bool _recipientDetailsAreValid)
                                 public isDistributor donationIsFunded(_donationID) returns( bool ) {
 
-        uint32  distributionClaim = _recipientCount * _distributionMonths * donations[_donationID].USDperRecipientPerMonth;
+        uint256  distributionClaim = _recipientCount * _distributionMonths * donations[_donationID].USDperRecipientPerMonth;
         uint256  availableToClaim  = donations[_donationID].donationAmount -
                                 (donations[_donationID].donationGrantedAmount + donations[_donationID].requestedNotGrantedAmount);
         require( availableToClaim >= distributionClaim, "This donation has insufficient funds to distribute." );
@@ -323,7 +331,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
 
     /// @dev send funds to a Distribution if the conditions are met
     /// @notice if successful Update the amount granted on the donation and reduce the amount requested
-    function requestDonationFunds(uint32 _distributionID) public payable isDonor distributionCanProceed(_distributionID) {
+    function requestDonationFunds(uint32 _distributionID, uint32 _donorID) public payable isDonor distributionCanProceed(_distributionID, _donorID) {
       donations[distributions[_distributionID].donationID].donationGrantedAmount += distributions[_distributionID].distributionAmount;
       donations[distributions[_distributionID].donorID].requestedNotGrantedAmount -= distributions[_distributionID].distributionAmount;
       distributions[_distributionID].distributionState = DistributionState.FundsApproved;

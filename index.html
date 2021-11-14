@@ -14,19 +14,12 @@
 
   <div class="split left">
     <div class="centered">
-      <div class = "Metamask" >
-        <button id="mm-connect">Connect to MetaMask</button>
-        <div id="mm-current-account"></div>         <div id="mmMessage"></div>
-        <div id="mm-current-balance"></div>
-        <div id="donor-connection"></div>
-      </div>
+      <div id="donor-connection"></div>
+      <div id="donatedTotal"></div>
+
       <div class = "donor" >
         <h2 id="donorheader" </h2>
       </div>
-      <div id="donatedTotal"></div>
-      <!-- <div id="grantedTotal"></div>
-      <div id="notGrantedTotal"></div>
-      <div id="withdrawlTotal"></div> -->
 
       <label> Donor Name
           <input id="inputDonorName" type="string" placeholder="Input Donor Name"/>
@@ -36,8 +29,8 @@
         <div class = "donation" >
           <h2 id="donationheader" </h2>
         </div>
-        <div class="scrollit">
-          <table>
+        <div class="donationtable">
+          <table id="donationtable" >
           </table>
         </div>
         <br></br>
@@ -46,8 +39,8 @@
           <input id="inputDonationName" type="string" placeholder="Donation Name"/>
         </label>
 
-        <label> USD per month
-          <input id="inputUSDpm" type="number" value = 40 placeholder="USD per Month"/>
+        <label> ETH per recipient per month
+          <input id="inputUSDpm" type="number" value = 0.01 placeholder="ETH per Month"/>
         </label>
 
         <label> Admin Fee%
@@ -64,17 +57,35 @@
         <label>  Donation ID
           <input id="inputDonationID" type="number"  placeholder="Donation ID"/>
         </label>
-        <label>  Donation amount
+        <label>  Donation amount (ETH)
           <input id="inputDonationAmount" type="number" value = 10 placeholder="Donation Amount"/>
         </label>
         <button id="makeDonation"  >Donate Funds</button>
+        <!-- <br></br> -->
+        <label>  Distribution ID
+          <input id="inputDistributionID" type="number"  placeholder="Distribution ID"/>
+        </label>
+        <button id="approveDistribution"  >Approve Distribution</button>
+        <!-- <br></br> -->
+        <label>  Withdrawl amount (not implemented)
+          <input id="donorWithdrawl" type="number"  placeholder="Withdrawl amount"/>
+        </label>
+        <button id="donorWithdrawlBtn"  >Withdraw Donor Funds</button>
 
     </div>
   </div>
 
   <div class="split right">
     <div class="centered">
-      <br></br>
+      <div class = "buttons" >
+        <button id="mm-connect">Connect to MetaMask</button>
+        <button id="refreshPage">Refresh</button>
+      </div>
+      <!-- <div id="mm-current-account"></div>          -->
+      <div id="mmMessage"></div>
+      <!-- <div id="mm-current-balance"></div>
+       -->
+      <!-- <br></br> -->
 
       <div id="distributor-connection"></div>
 
@@ -108,6 +119,13 @@
       <div class = "distribution" >
       <h2 id="distributionheader" </h2>
       </div>
+
+      <div class="distrotable">
+        <table id="distrotable" >
+        </table>
+     </div>
+     <br></br>
+
       <label> Donation ID
         <input id="inputDonID" type="string" placeholder="Donation ID"/>
       </label>
@@ -121,10 +139,19 @@
       </label>
       <button id="addDistribution"  >Add Distribution</button>
 
-      <div class="scrollit">
-        <table>
-        </table>
-      </div>
+      <div id="distrutionErrors"></div>
+
+      <br></br>
+      <label> Load recipient file (Not implementd yet)
+        <!-- <input id="inputMonths" type="number" value = 1 placeholder="Months"/> -->
+      </label>
+      <button id="loadRecipientFile"  >Add Recipients</button>
+      <br></br>
+      <label>  Withdrawl amount (not implemented)
+        <input id="distributorWithdrawl" type="number"  placeholder="Withdrawl amount"/>
+      </label>
+      <button id="distributorWithdrawlBtn"  > Withdraw Distributor Funds </button>
+
   </div>
 </body>
 

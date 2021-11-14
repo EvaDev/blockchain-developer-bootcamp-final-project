@@ -630,9 +630,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "USDperRecipientPerMonth",
-        "type": "uint32"
+        "type": "uint256"
       },
       {
         "internalType": "uint8",
@@ -917,9 +917,9 @@
         "type": "uint32"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint256",
         "name": "_USDperRecipientPerMonth",
-        "type": "uint32"
+        "type": "uint256"
       },
       {
         "internalType": "uint8",
@@ -962,6 +962,11 @@
       {
         "internalType": "uint32",
         "name": "_donationID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_donorID",
         "type": "uint32"
       }
     ],
@@ -1111,6 +1116,11 @@
       {
         "internalType": "uint32",
         "name": "_distributionID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_donorID",
         "type": "uint32"
       }
     ],
