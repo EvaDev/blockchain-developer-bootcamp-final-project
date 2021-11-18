@@ -1,7 +1,7 @@
 //const { Contract } = require("ethers");
 
 // contract address :
-const contractAddress = '0xc54630fa635ABF1BB3F75e2474c05a7529AC4E49'
+const contractAddress = '0x9A898569bd7f7cBD279cf4f9d4EE949Cc04006C7'
 
 // add contract ABI from Remix:
 //const { abi } = require('./build/contracts/DonationManager.json');
@@ -14,11 +14,6 @@ const contractABI = [  {
         "internalType": "string",
         "name": "_donorName",
         "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "currentBalance",
-        "type": "uint256"
       }
     ],
     "name": "createDonor",
@@ -537,6 +532,60 @@ const contractABI = [  {
     "stateMutability": "view",
     "type": "function"
   },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_distributionID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_donorID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address payable",
+        "name": "recipient",
+        "type": "address"
+      }
+    ],
+    "name": "giveFunds",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "_distributionID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_donorID",
+        "type": "uint32"
+      }
+    ],
+    "name": "approveFunds",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "payable": true
+  },
 ]
 
 //import fs from 'fs';
@@ -555,11 +604,13 @@ const addDonor        = document.getElementById('addDonor');
 const addDonation     = document.getElementById('addDonation');
 const addDistributor  = document.getElementById('addDistributor');
 const addDistribution = document.getElementById('addDistribution');
-const approveDistribution = document.getElementById('approveDistribution');
+//const approveDistribution = document.getElementById('approveDistribution');
 const makeDonationBtn = document.getElementById('makeDonation');
 const refreshPage     = document.getElementById('refreshPage');
 const dist_table      = document.getElementById("distrotable")
 const table           = document.getElementById("donationtable")
+const sendFunds       = document.getElementById('sendDistribution');
+
 const distributorWithdrawlBtn = document.getElementById("distributorWithdrawlBtn")
 const donorWithdrawlBtn       = document.getElementById("donorWithdrawlBtn")
 const loadRecipientFile       = document.getElementById("loadRecipientFile")
@@ -607,9 +658,9 @@ window.addEventListener('load', function() {
 const initialiseFrontEnd = async function () {
   let web3 = new Web3(window.ethereum)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
-  web3.handleRevert = true
+  //web3.handleRevert = true
   dm.setProvider(window.ethereum)
-  dm.handleRevert = true
+  //dm.handleRevert = true
 
   numDonors = await dm.methods.donorCount().call()
   const donorCount = document.getElementById('donorheader')
@@ -680,7 +731,7 @@ function generateTableHead(table, data) {
     } 
     if (key == 'donationAmount') {
       let th = document.createElement("th");
-      let text = document.createTextNode('Amount');
+      let text = document.createTextNode('Donated');
       th.appendChild(text);
       row.appendChild(th);  
     } 
@@ -759,7 +810,7 @@ function generateTable(table, data) {
       if (key == 'donationState') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
-        console.log('Text' + text.nodeValue)
+        //console.log('Text' + text.nodeValue)
         if (text.nodeValue == 0) {text.nodeValue = 'Created';  }
         if (text.nodeValue == 1) {text.nodeValue = 'Funded';  }
         if (text.nodeValue == 2) {text.nodeValue = 'Distributing';  }
@@ -882,12 +933,14 @@ const refreshPageFunction = async function ()  {
   await ethereum.request({ method: 'eth_requestAccounts'})
   let accounts = await web3.eth.getAccounts();
   showBalance = await web3.eth.getBalance(accounts[0])/1e18;
-  console.log('balance = : ', await web3.eth.getBalance(accounts[0]));
-
+  //console.log('balance Account[0] = : ', await web3.eth.getBalance(accounts[0]));
+  // Initialise
   let connectedAsDonor       = document.getElementById('donor-connection');
   let connectedAsDistributor = document.getElementById('distributor-connection');
+  let donatedTotal           = document.getElementById('donatedTotal')
   connectedAsDonor.innerHTML = ''
   connectedAsDistributor.innerHTML = ''
+  donatedTotal.innerHTML = ''
   isConnectedToMM = true
   // Check who we are connected as - it could be a donor or distributor or neither (unregistered)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
@@ -901,6 +954,7 @@ const refreshPageFunction = async function ()  {
       console.log('Got a match: ' + donorStruct.donorAddress + ' ' + donorStruct.donorName+ ' ' + donorStruct.donorID)
       connectedAsDonor.innerHTML = 'Connected as Donor: ' + donorStruct.donorName + ' ID ' + donorStruct.donorID;
       currentDonorID = donorStruct.donorID;
+      showBalance = await web3.eth.getBalance(donorStruct.donorAddress)/1e18;
       getDonorBalances()
     }     
   }
@@ -919,6 +973,7 @@ const refreshPageFunction = async function ()  {
         connectedAsDistributor.innerHTML = 'Connected as Distributor: ' + distribStruct.distributorName + '     ID ' + 
                         distribStruct.distributorID + '      Country: ' + distribStruct.distributorCountry + 
                         '      Status:   ' + status;
+      showBalance = await web3.eth.getBalance(distribStruct.distributorAddress)/1e18;
       }     
     }    
   }
@@ -931,11 +986,12 @@ const setButtons = function() {
   addDistributor.disabled = true;
   addDistribution.disabled = true;
   addDonation.disabled = true;
-  approveDistribution.disabled = true;
+  //approveDistribution.disabled = true;
   makeDonationBtn.disabled = true;
   donorWithdrawlBtn.disabled = true;
   distributorWithdrawlBtn.disabled = true;
   loadRecipientFile.disabled = true;
+  sendFunds.disabled = true;
   let mmMessage = document.getElementById('mmMessage')
 
   if (isConnectedToMM) {
@@ -944,7 +1000,8 @@ const setButtons = function() {
       //addDonor.disabled = false;
       addDonation.disabled = false;
       makeDonationBtn.disabled = false;
-      approveDistribution.disabled = false;
+      //approveDistribution.disabled = false;
+      canSendFunds();
       //console.log('Enabled Donation? ' + addDonation.disabled)
       mmMessage.innerHTML = 'MetaMask IS Connected as DONOR ID ' + currentDonorID + ' bal ' + showBalance
     }   
@@ -969,27 +1026,36 @@ const setButtons = function() {
     donorName             = 'None';
     currentDistributorID  = -1;
     distributorName       = 'None';
-
   }
+}
+
+const canSendFunds = function() {
+  const inputDistributionID = document.getElementById('inputDistributionID').value;
+
+  let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
+  let sendAmount = distributionsStruct.distributionAmount
+  let distribStruct = await dm.methods.allDistributors(0).call()
+  const distAddr   = distribStruct.distributorAddress
+  console.log('Distr Addr looked up from contract ' + distAddr + '_' + sendAmount)
+  console.log('Distr Status ' + distributionsStruct.distributionState)
+  if (distributionsStruct.distributionState == 1 ) {
+    sendFunds.disabled = false;
+  }
+
 }
 
 // get current donors and populate table
 const getDonorBalances = async function () {
   const donatedTotal = document.getElementById('donatedTotal')
-  // const grantedTotal = document.getElementById('grantedTotal')
-  // const notGrantedTotal = document.getElementById('notGrantedTotal')
-  // const withdrawlTotal = document.getElementById('withDrawlTotal')
   var web3 = new Web3(window.ethereum)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
   dm.setProvider(window.ethereum)
-  //let donorStruct = await dm.methods.allDonors(x).call()
   let donorBalances = await dm.methods.getAllDonorBalances(currentDonorID).call()
-  console.log('Getting balances: ' + ' ' + donorBalances.donatedAmount + ' ' + currentDonorID)
-  donatedTotal.innerHTML    = 'Donated : ' + donorBalances.donatedAmount + '  Granted total: ' + donorBalances.grantedAmount
-            + '  Not Granted : ' + donorBalances.requestedNotGranted
-  // grantedTotal.innerHTML    = 'Granted total: ' + donorBalances.grantedAmount
-  // notGrantedTotal.innerHTML = 'Not Granted : ' + donorBalances.requestedNotGranted
-  //withdrawlTotal.innerHTML  = 'Available to withdraw: ' + donorBalances.fundsAvailableToWithdraw
+  //console.log('Sender balance: ' + ' ' + msg.sender.balance + ' _ ' + currentDonorID)
+  //console.log('Getting balances: ' + ' ' + donorBalances.donatedAmount/1e18 + ' ' + currentDonorID)
+  //console.log('Withdraw balance: ' + ' ' + donorBalances.fundsAvailableToWithdraw)
+  donatedTotal.innerHTML    = 'Donated : ' + donorBalances.donatedAmount/1e18 + '  Granted : ' + donorBalances.grantedAmount/1e18
+            + '  Not Granted : ' + donorBalances.requestedNotGranted/1e18 + ' Withdraw ' + donorBalances.fundsAvailableToWithdraw/1e18
 }
 
 // Add a donor:
@@ -997,12 +1063,12 @@ addDonor.onclick = async () => {
   const donorName = document.getElementById('inputDonorName').value;
   console.log(donorName)
   var web3 = await new Web3(window.ethereum)
-  var accounts = await web3.eth.getAccounts();
-  const bal = await web3.eth.getBalance(accounts[0]);
   const dm = new web3.eth.Contract(contractABI, contractAddress)
   dm.setProvider(window.ethereum)
-  await dm.methods.createDonor(donorName,bal).send({from: ethereum.selectedAddress})
-  refreshPageFunction()
+  await dm.methods.createDonor(donorName).send({from: ethereum.selectedAddress})
+  //initialiseFrontEnd()
+  // location.reload()
+  // refreshPageFunction()
 }
 
 addDonation.onclick = async () => {
@@ -1017,8 +1083,8 @@ addDonation.onclick = async () => {
   if (currentDonorID >= 0) {
     await dm.methods.createDonation(donationName,currentDonorID,donationUSDpd,donationFee).send({from: ethereum.selectedAddress})
     let table = document.querySelector("table")
-//    initialiseFrontEnd()
-    refreshPageFunction()
+    //location.reload()
+    //refreshPageFunction()
   }
 }
 
@@ -1073,17 +1139,44 @@ addDistribution.onclick = async () => {
   }
 }
 
-approveDistribution.onclick = async () => {
+// approveDistribution.onclick = async () => {
+//   const inputDistributionID = document.getElementById('inputDistributionID').value;
+//   var web3 = await new Web3(window.ethereum)
+//   const dm = new web3.eth.Contract(contractABI, contractAddress)
+// //  dm.handleRevert = true
+//   dm.setProvider(window.ethereum)
+//   if (currentDonorID >= 0) {
+//     try { 
+//       //console.log('Input DID ' + inputDistributionID + ' _ ' + currentDonorID )
+//       await dm.methods.approveFunds(inputDistributionID, currentDonorID).send({from: ethereum.selectedAddress})
+//       refreshPageFunction()
+//     } catch (e) {
+//         console.log('Message ' + e.message )
+// //        console.log('Code ' + e.code )
+// //        console.log('Reason ' + e.reason )
+//       }    
+//   }
+// }
+
+// This process triggers the send ffrom the front end and not the contract cos Icannot get the approve model to work
+sendDistribution.onclick = async () => {
   const inputDistributionID = document.getElementById('inputDistributionID').value;
   var web3 = await new Web3(window.ethereum)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
-//  dm.handleRevert = true
   dm.setProvider(window.ethereum)
   if (currentDonorID >= 0) {
     try { 
-      console.log('Input DID ' + inputDistributionID + ' _ ' + currentDonorID )
-      await dm.methods.requestDonationFunds(inputDistributionID, currentDonorID).send({from: ethereum.selectedAddress})
-      refreshPageFunction()
+      let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
+      let sendAmount = distributionsStruct.distributionAmount
+      let distribStruct = await dm.methods.allDistributors(0).call()
+      const distAddr   = distribStruct.distributorAddress
+      console.log('Distr Addr looked up from contract ' + distAddr + '_' + sendAmount)
+      console.log('Distr Status ' + distributionsStruct.distributionState)
+      if (distributionsStruct.distributionState == 1 ) {
+        await dm.methods.giveFunds(inputDistributionID, currentDonorID, distAddr).send({from: ethereum.selectedAddress})
+        //await dm.methods.giveFunds(inputDistributionID, currentDonorID, distAddr).send({from: dm.contractAddress})
+        await web3.eth.sendTransaction({to : distAddr, value: sendAmount, from: ethereum.selectedAddress})
+      }
     } catch (e) {
         console.log('Message ' + e.message )
         console.log('Code ' + e.code )

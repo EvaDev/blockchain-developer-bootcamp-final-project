@@ -77,6 +77,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
     event LogDonorAdded(address indexed donorAddress, uint32 donorID, uint256 balance);
     event LogDonorDeposit(address indexed donorAddress, uint256 donationAmount);
     event LogDonorWithdrawal(address indexed donorAddress, uint256 withdrawAmount, uint256 remainingBalance);
+    event LogSender(address senderAddr, uint256 senderBal);
 
     /// @dev Distributors
     uint32 public distributorCount;
@@ -101,12 +102,6 @@ contract DonationManager is ERC20, Pausable, Ownable {
         require(donorBalances[msg.sender] >= 0, "This function is restricted to donors." );
         _;
     }
-
-    /// @dev check that this is the donor of this donation
-    // modifier isTheDonorOf(uint32 _donorID, uint32 _donationID) {
-    //     require(donations[_donorID]. >= 0, "This function is restricted to donors." );
-    //     _;
-    // }
 
     /// @dev A distributor cannot become a donor
     /// @dev A donor can only be added once
@@ -138,7 +133,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
         require(distributions[_distributionID].distributionState == DistributionState.FundsRequested, "Distribution cannot proceed status is not funds requested");
         require(allDistributors[distributions[_distributionID].distributorID].distributorStatus != DistributorStatus.unTrusted, "Distribution cannot proceed - Distributor untrusted");
         require(donations[distributions[_distributionID].donationID].requestedNotGrantedAmount >= distributions[_distributionID].distributionAmount , "Distribution cannot proceed");
-        require(donorBalances[msg.sender] >= distributions[_distributionID].distributionAmount , "Distribution cannot proceed - insufficient funds");
+        //require(donorBalances[msg.sender] >= distributions[_distributionID].distributionAmount , "Distribution cannot proceed - insufficient funds");
         _;
     }
 
@@ -169,17 +164,17 @@ contract DonationManager is ERC20, Pausable, Ownable {
 
     /// @dev Create a new donor - It connot come from the same address as an exiting distributor
     /// @dev amount donated is just a running balance, not an actual account balance
-    function createDonor(string memory _donorName, uint256 currentBalance) payable public onlyDonor returns( bool ) {
+    function createDonor(string memory _donorName) public onlyDonor returns( bool ) {
         allDonors[donorCount] = Donor( {
             donorID         : donorCount,
-            donorAddress    :  payable(msg.sender),
+            donorAddress    : payable(msg.sender),
             amountDonated   : 0,
             donorName       : _donorName
         });
         //donorBalances[msg.sender] = 0;
         // Set donor balance to amount in donor's account
-        donorBalances[msg.sender] = currentBalance;
-        emit LogDonorAdded(msg.sender, donorCount, msg.value);
+        donorBalances[msg.sender] = msg.sender.balance;
+        emit LogDonorAdded(msg.sender, donorCount, msg.sender.balance);
         donorCount = donorCount + 1;
         return true;
     }
@@ -195,7 +190,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
             distributorStatus   : DistributorStatus.New
         });
         /// @notice  Set the distributor's balance to
-        distributorBalances[msg.sender] = 0;
+        distributorBalances[msg.sender] = msg.sender.balance;
         emit LogDistributorStatus(msg.sender, distributorCount, _distributorName, DistributorStatus.New);
         distributorCount = distributorCount + 1;
         return true;
@@ -228,17 +223,17 @@ contract DonationManager is ERC20, Pausable, Ownable {
         return true;
     }
 
-    function donorDeposit(uint256 _depositAmount) public isDonor payable {
-        donorBalances[msg.sender] += _depositAmount;
-        require(msg.value > _depositAmount, "Insufficient funds");
-        (bool sent,) = msg.sender.call{value: _depositAmount}("");
-        require(sent, "Failed to deposit funds to the donor");
-        emit LogDonorDeposit(msg.sender, _depositAmount);
-    }
+    // function donorDeposit(uint256 _depositAmount) public isDonor payable {
+    //     donorBalances[msg.sender] += _depositAmount;
+    //     require(msg.value > _depositAmount, "Insufficient funds");
+    //     (bool sent,) = msg.sender.call{value: _depositAmount}("");
+    //     require(sent, "Failed to deposit funds to the donor");
+    //     emit LogDonorDeposit(msg.sender, _depositAmount);
+    // }
 
     /// @dev Allow the donor to ring fence funds for a donation. No actual transfer of funds.
     function makeDonation(uint256 _donationAmount, uint32 _donationID, uint32 _donorID) public isDonor  {
-      require((donorBalances[msg.sender] - allDonors[_donationID].amountDonated) >= _donationAmount, "Donation amount exceeds donor available balance");
+      require((msg.sender.balance - allDonors[_donationID].amountDonated) >= _donationAmount, "Donation amount exceeds donor available balance");
       require(donations[_donationID].donorID  == _donorID, "Donation does not belong to this donor");
       uint32 donorID = donations[_donationID].donorID;
       allDonors[donorID].amountDonated += _donationAmount;
@@ -278,21 +273,25 @@ contract DonationManager is ERC20, Pausable, Ownable {
       uint256  _donatedAmount = 0;
       uint256  _grantedAmount = 0;
       uint256  _requestedNotGranted = 0;
-      uint256  _fundsAvailableToWithdraw = donorBalances[msg.sender];
+      uint256  _fundsAvailableToWithdraw = 0;
+      //uint256  _fundsAvailableToWithdraw = msg.sender.balance;   // For some reason giving very high balances???
+      //uint256  _fundsAvailableToWithdraw = address(this).balance;
+      
       for (uint32 i = 0; i < donations.length; i++) {
             if (donations[i].donorID == _donorID) {
-                _donatedAmount += _donatedAmount;
-                _grantedAmount += _grantedAmount;
-                _requestedNotGranted += _requestedNotGranted;
+                _donatedAmount += donations[i].donationAmount;
+                _grantedAmount += donations[i].donationGrantedAmount;
+                _requestedNotGranted += donations[i].requestedNotGrantedAmount;
+                _fundsAvailableToWithdraw =  allDonors[i].donorAddress.balance;
             }
       }
       return (_donatedAmount,_grantedAmount,_requestedNotGranted,_fundsAvailableToWithdraw );
     }
 
     /// @dev Get the balances of the ddistributor across all distributions
-    function getDistributorBalance() public isDistributor view returns (uint256 availbleToWithdraw) {
-      return (distributorBalances[msg.sender]);
-    }
+    // function getDistributorBalance() public isDistributor view returns (uint256 availbleToWithdraw) {
+    //   return (distributorBalances[msg.sender]);
+    // }
 
     /// @dev Create a new distribution - It cannot come from an exiting donor
     /// @notice Requires that The donor list is verified - verification of lists to happen outside on IPFS - not implemented
@@ -329,30 +328,60 @@ contract DonationManager is ERC20, Pausable, Ownable {
         return true;
     }
 
-    /// @dev send funds to a Distribution if the conditions are met
+    /// @dev send funds to a Distributor if the conditions are met
     /// @notice if successful Update the amount granted on the donation and reduce the amount requested
-    function requestDonationFunds(uint32 _distributionID, uint32 _donorID) public payable isDonor distributionCanProceed(_distributionID, _donorID) {
-      donations[distributions[_distributionID].donationID].donationGrantedAmount += distributions[_distributionID].distributionAmount;
-      donations[distributions[_distributionID].donorID].requestedNotGrantedAmount -= distributions[_distributionID].distributionAmount;
+    function approveFunds(uint32 _distributionID, uint32 _donorID) public returns ( bool ){
+
+      address donorAddr = (allDonors[_donorID].donorAddress);
+      uint256 distrAmt  = distributions[_distributionID].distributionAmount;
+      require((distrAmt > 0 ), "Distribution amount cannot be negative");
+      require((distrAmt < donorAddr.balance ), "Insufficient Donor Funds");
+
+      donations[_donorID].donationGrantedAmount += distrAmt;
+      donations[_donorID].requestedNotGrantedAmount -= distrAmt;
       distributions[_distributionID].distributionState = DistributionState.FundsApproved;
+      //(bool approved ) = approve( owner() ,distrAmt);
+      emit LogSender( address(this) ,  distrAmt );
+      (bool approved ) = approve( address(this) ,distrAmt);
+      require(approved, "Failed to approve funds transfer to the distributor");
+      return approved;
+    }
+
+    function giveFunds(uint32 _distributionID, uint32 _donorID, address payable recipient ) 
+                public isDonor returns( bool ){
+    //             public payable isDonor distributionCanProceed(_distributionID, _donorID) returns( bool ){
+
+      //address distAddr  = (allDistributors[distributions[_distributionID].distributorID].distributorAddress);
+      address donorAddr = (allDonors[_donorID].donorAddress);
+      uint256 distrAmt  = distributions[_distributionID].distributionAmount;
+      require((distrAmt > 0 ), "Distribution amount cannot be negative");
+      require((msg.sender == donorAddr ), "Sender is not the Donor ");
+      require((distrAmt < msg.sender.balance ), "Insufficient Funds");
+
+      donations[_donorID].donationGrantedAmount += distrAmt;
+      donations[_donorID].requestedNotGrantedAmount -= distrAmt;
+      distributions[_distributionID].distributionState = DistributionState.FundsApproved;
+      donorBalances[allDonors[_donorID].donorAddress] -=  distrAmt;
+
+      emit LogSender( msg.sender ,  distrAmt );
+      //(bool sent ) = transferFrom( donorAddr, recipient, distrAmt);
+      //(bool sent ,) = recipient.call{value: distrAmt}("");
+
       emit LogDistributionState(_distributionID, allDistributors[distributions[_distributionID].distributorID].distributorName,
                                  donations[distributions[_distributionID].donationID].donationName,
                                  DistributionState.FundsApproved);
       emit LogDonationState(distributions[_distributionID].donationID,
                             donations[distributions[_distributionID].donationID].donationName,
                             DonationState.Distributing);
-      address distAddr = payable(allDistributors[distributions[_distributionID].distributorID].distributorAddress);
-      uint256 distrAmt = distributions[_distributionID].distributionAmount;
-      /// @notice Check that this is actually seding from donor to distributor
-      (bool sent,) = distAddr.call{value: distrAmt}("");
-      require(sent, "Failed to send funds to the distributor");
+
+      return true;
     }
 
     /// @dev Allow the donor to withdraw funds balance provided there are no distributions that have submitted funding requests
     function donorWithdrawal(uint256 _withdrawAmount, uint32 _donorID) public payable isDonor distributionsAreUpToDate (_donorID) {
-      require(donorBalances[msg.sender] >= _withdrawAmount, "Withdrawal request exceeds donor balance");
-      donorBalances[msg.sender] -= _withdrawAmount;
-      emit LogDonorWithdrawal(msg.sender, _withdrawAmount, donorBalances[msg.sender]);
+      require(msg.sender.balance >= _withdrawAmount, "Withdrawal request exceeds donor balance");
+      //donorBalances[msg.sender] -= _withdrawAmount;
+      emit LogDonorWithdrawal(msg.sender, _withdrawAmount, (msg.sender.balance - _withdrawAmount));
       //payable(msg.sender).transfer(_withdrawAmount);
       (bool sent,) = msg.sender.call{value: _withdrawAmount}("");
       require(sent, "Failed to withdraw funds to the donor");
@@ -360,9 +389,9 @@ contract DonationManager is ERC20, Pausable, Ownable {
 
     /// @dev Allow the distributor to withdraw funds balance
     function distributorWithdrawal(uint _withdrawAmount) public payable isDistributor  {
-      require(distributorBalances[msg.sender] >= _withdrawAmount, "Withdrawal request exceeds balance");
-      distributorBalances[msg.sender] -= _withdrawAmount;
-      emit LogDistributorWithdrawal(msg.sender, _withdrawAmount, distributorBalances[msg.sender]);
+      require(msg.sender.balance >= _withdrawAmount, "Withdrawal request exceeds balance");
+      //distributorBalances[msg.sender] -= _withdrawAmount;
+      emit LogDistributorWithdrawal(msg.sender, _withdrawAmount, (msg.sender.balance - _withdrawAmount));
       //payable(msg.sender).transfer(withdrawAmount);
       (bool sent,) = msg.sender.call{value: _withdrawAmount}("");
       require(sent, "Failed to withdraw funds to the donor");

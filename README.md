@@ -105,7 +105,7 @@ truffle-abi
 
 npm install -g solc
 
-create front end
+create front end files:  index.html and dapp.js
 
 npx http server  
 
