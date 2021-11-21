@@ -276,7 +276,7 @@ contract DonationManager is ERC20, Pausable, Ownable {
       uint256  _fundsAvailableToWithdraw = 0;
       //uint256  _fundsAvailableToWithdraw = msg.sender.balance;   // For some reason giving very high balances???
       //uint256  _fundsAvailableToWithdraw = address(this).balance;
-      
+
       for (uint32 i = 0; i < donations.length; i++) {
             if (donations[i].donorID == _donorID) {
                 _donatedAmount += donations[i].donationAmount;
@@ -347,8 +347,9 @@ contract DonationManager is ERC20, Pausable, Ownable {
       return approved;
     }
 
-    function giveFunds(uint32 _distributionID, uint32 _donorID, address payable recipient ) 
+    function giveFunds(uint32 _distributionID, uint32 _donorID ) 
                 public isDonor returns( bool ){
+    // function giveFunds(uint32 _distributionID, uint32 _donorID, address payable recipient )
     //             public payable isDonor distributionCanProceed(_distributionID, _donorID) returns( bool ){
 
       //address distAddr  = (allDistributors[distributions[_distributionID].distributorID].distributorAddress);

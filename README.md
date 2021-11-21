@@ -109,6 +109,12 @@ create front end files:  index.html and dapp.js
 
 npx http server  
 
+For deployment to Ropsten
+npm i dotenv
+npm install @truffle/hdwallet-provider
+Update truffle-config.js
+create
+
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.
 
