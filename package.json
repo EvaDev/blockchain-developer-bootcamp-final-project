@@ -1,13 +1,9 @@
 {
-  "homepage":"http://EvaDev.github.io/blockchain-developer-bootcamp-final-project",
   "name": "fp",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "build": "react-scripts build",
     "test": "truffle compile && mocha --exit --recursive"
   },
   "keywords": [],
