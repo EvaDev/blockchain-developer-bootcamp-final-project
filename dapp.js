@@ -1029,7 +1029,7 @@ const setButtons = function() {
   }
 }
 
-const canSendFunds = function() {
+const canSendFunds = async function() {
   const inputDistributionID = document.getElementById('inputDistributionID').value;
 
   let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
