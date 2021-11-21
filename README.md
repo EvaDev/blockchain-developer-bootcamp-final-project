@@ -8,12 +8,12 @@ In South Africa where I live the Covid pandemic has highlighted the need to easi
 
 Donation management concepts :
 A = Donors        : Have funds available and want them to go to the needy  
-B = Donations     : A portion of the donor funds with some metadata.  
-                    A donors can make multiple donations  
+B = Donations     : A portion of donor funds with some metadata.  
 C = Distributors  : Have on the ground connections with the needy (Also called NGO’s)  
 D = Distributions : Links a donation to a list of recipients and can be allocated funds of successful  
-                    A distributor can create multiple distributions  
-                    A distribution can only come from one donation  
+Donors can make multiple donations.  
+Distributors can create multiple distributions  
+Distributions can only come from one donation  
 
 **Simplified workflow on the website**
 1. Donors can
@@ -113,7 +113,15 @@ For deployment to Ropsten
 npm i dotenv
 npm install @truffle/hdwallet-provider
 Update truffle-config.js
-create
+
+For Deployment to Heroku  :
+brew tap heroku/brew && brew install heroku
+
+git remote add heroku  https://git.heroku.com/consensysfp.git
+
+npm install gh-pages --save-dev
+update package.json file with scripts & homepage
+npm run deploy
 
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.

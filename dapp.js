@@ -1,7 +1,7 @@
 //const { Contract } = require("ethers");
 
 // contract address :
-const contractAddress = '0x9A898569bd7f7cBD279cf4f9d4EE949Cc04006C7'
+const contractAddress = '0x331A60480eC566e8214151bD268Fe08498Bb5EA0'
 
 // add contract ABI from Remix:
 //const { abi } = require('./build/contracts/DonationManager.json');
@@ -694,7 +694,7 @@ const initialiseFrontEnd = async function () {
     generateTableHead(table, Object.keys(donationStruct[0]))
     } catch (e) {
       console.log('Problem getting donations: ' + e.message)
-    }    
+    }
   }
   // Get Current Distributions
   if (numDistributions > 0) {
@@ -709,7 +709,7 @@ const initialiseFrontEnd = async function () {
       generateDistTableHead(dist_table, Object.keys(distributionStruct[0]))
       } catch (e) {
         console.log('Problem getting distributionStruct ' + e.message )
-      }    
+      }
     }
   }
 
@@ -721,50 +721,50 @@ function generateTableHead(table, data) {
       let th = document.createElement("th");
       let text = document.createTextNode('Donation ID');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'donationName')  {
       let th = document.createElement("th");
       let text = document.createTextNode('Name');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'donationAmount') {
       let th = document.createElement("th");
       let text = document.createTextNode('Donated');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'donationGrantedAmount') {
       let th = document.createElement("th");
       let text = document.createTextNode('Granted');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'requestedNotGrantedAmount') {
       let th = document.createElement("th");
       let text = document.createTextNode('Awaiting Approval');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'USDperRecipientPerMonth') {
       let th = document.createElement("th");
       let text = document.createTextNode('Eth/Month');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'adminFeePercent') {
       let th = document.createElement("th");
       let text = document.createTextNode('Fee %');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'donationState') {
       let th = document.createElement("th");
       let text = document.createTextNode('Donation Status');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
   }
 }
 
@@ -791,22 +791,22 @@ function generateTable(table, data) {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]/1e18);
         cell.appendChild(text);
-      } 
+      }
       if (key == 'requestedNotGrantedAmount') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]/1e18);
         cell.appendChild(text);
-      } 
+      }
       if (key == 'USDperRecipientPerMonth') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]/1e18);
         cell.appendChild(text);
-      } 
+      }
       if (key == 'adminFeePercent') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
         cell.appendChild(text);
-      } 
+      }
       if (key == 'donationState') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
@@ -815,7 +815,7 @@ function generateTable(table, data) {
         if (text.nodeValue == 1) {text.nodeValue = 'Funded';  }
         if (text.nodeValue == 2) {text.nodeValue = 'Distributing';  }
         cell.appendChild(text);
-      } 
+      }
     }
   }
 }
@@ -828,43 +828,43 @@ function generateDistTableHead(table, data) {
       let th = document.createElement("th");
       let text = document.createTextNode('Distribution ID');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'donationID')  {
       let th = document.createElement("th");
       let text = document.createTextNode('Donation ID');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'distributorID')  {
       let th = document.createElement("th");
       let text = document.createTextNode('Distributor ID');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'distributionAmount') {
       let th = document.createElement("th");
       let text = document.createTextNode('Amount Claimed');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'recipientCount') {
       let th = document.createElement("th");
       let text = document.createTextNode('Recipients');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'distributionMonths') {
       let th = document.createElement("th");
       let text = document.createTextNode('Months');
       th.appendChild(text);
-      row.appendChild(th);  
-    } 
+      row.appendChild(th);
+    }
     if (key == 'distributionState') {
       let th = document.createElement("th");
       let text = document.createTextNode('Distribution Status');
       th.appendChild(text);
-      row.appendChild(th);  
+      row.appendChild(th);
     }
   }
 }
@@ -896,12 +896,12 @@ function generateDistTable(table, data) {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
         cell.appendChild(text);
-      } 
+      }
       if (key == 'distributionMonths') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
         cell.appendChild(text);
-      } 
+      }
       if (key == 'distributionState') {
         let cell = row.insertCell();
         let text = document.createTextNode(element[key]);
@@ -910,7 +910,7 @@ function generateDistTable(table, data) {
         if (text.nodeValue == 2) {text.nodeValue = 'Approved';  }
         if (text.nodeValue == 3) {text.nodeValue = 'NOT Approved';  }
         cell.appendChild(text);
-      } 
+      }
     }
   }
 }
@@ -926,7 +926,7 @@ refreshPage.onclick = async () => {
   table.innerHTML = "";
   dist_table.innerHTML = "";
   initialiseFrontEnd()
-}  
+}
 
 const refreshPageFunction = async function ()  {
   let web3 = new Web3(window.ethereum)
@@ -956,7 +956,7 @@ const refreshPageFunction = async function ()  {
       currentDonorID = donorStruct.donorID;
       showBalance = await web3.eth.getBalance(donorStruct.donorAddress)/1e18;
       getDonorBalances()
-    }     
+    }
   }
 
   if (currentDonorID == -1) {
@@ -970,12 +970,12 @@ const refreshPageFunction = async function ()  {
         let status = 'NEW';
         if (distribStruct.distributorStatus == 1) {status = 'UNTrusted'} ;
         if (distribStruct.distributorStatus == 2) {status = 'Trusted'} ;
-        connectedAsDistributor.innerHTML = 'Connected as Distributor: ' + distribStruct.distributorName + '     ID ' + 
-                        distribStruct.distributorID + '      Country: ' + distribStruct.distributorCountry + 
+        connectedAsDistributor.innerHTML = 'Connected as Distributor: ' + distribStruct.distributorName + '     ID ' +
+                        distribStruct.distributorID + '      Country: ' + distribStruct.distributorCountry +
                         '      Status:   ' + status;
       showBalance = await web3.eth.getBalance(distribStruct.distributorAddress)/1e18;
-      }     
-    }    
+      }
+    }
   }
   setButtons()
 }
@@ -1004,19 +1004,19 @@ const setButtons = function() {
       canSendFunds();
       //console.log('Enabled Donation? ' + addDonation.disabled)
       mmMessage.innerHTML = 'MetaMask IS Connected as DONOR ID ' + currentDonorID + ' bal ' + showBalance
-    }   
+    }
 
     if ((currentDonorID == -1 ) && (currentDistributorID >= 0)) {
       addDistribution.disabled = false;
       addDistributor.disabled = false;
       mmMessage.innerHTML = 'MetaMask IS Connected as DISTRIBUTOR ID ' + currentDistributorID  + ' bal ' + showBalance
-    }   
+    }
 
     if ((currentDonorID == -1) && (currentDistributorID == -1)) {
       addDonor.disabled = false;
       addDistributor.disabled = false;
       mmMessage.innerHTML = 'MetaMask IS Connected as a new (unregistered) user '  + ' bal ' + showBalance
-    }   
+    }
   } else {
     console.log('MetaMask ' + isConnectedToMM)
     mmMessage.innerHTML = 'MetaMask Is NOT Connected!'
@@ -1126,7 +1126,7 @@ addDistribution.onclick = async () => {
   dm.handleRevert = true
   dm.setProvider(window.ethereum)
   if (currentDistributorID >= 0) {
-    try { 
+    try {
       await dm.methods.createDistribution(currentDistributorID,donationID,recipients,months,true).send({from: ethereum.selectedAddress})
       distMessages.innerHTML = 'Distribution Added Successfully'
       refreshPageFunction()
@@ -1135,7 +1135,7 @@ addDistribution.onclick = async () => {
         console.log('Message ' + e.message )
         console.log('Code ' + e.code )
 //        console.log('Reason ' + e.reason )
-      }    
+      }
   }
 }
 
@@ -1146,7 +1146,7 @@ addDistribution.onclick = async () => {
 // //  dm.handleRevert = true
 //   dm.setProvider(window.ethereum)
 //   if (currentDonorID >= 0) {
-//     try { 
+//     try {
 //       //console.log('Input DID ' + inputDistributionID + ' _ ' + currentDonorID )
 //       await dm.methods.approveFunds(inputDistributionID, currentDonorID).send({from: ethereum.selectedAddress})
 //       refreshPageFunction()
@@ -1154,7 +1154,7 @@ addDistribution.onclick = async () => {
 //         console.log('Message ' + e.message )
 // //        console.log('Code ' + e.code )
 // //        console.log('Reason ' + e.reason )
-//       }    
+//       }
 //   }
 // }
 
@@ -1165,7 +1165,7 @@ sendDistribution.onclick = async () => {
   const dm = new web3.eth.Contract(contractABI, contractAddress)
   dm.setProvider(window.ethereum)
   if (currentDonorID >= 0) {
-    try { 
+    try {
       let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
       let sendAmount = distributionsStruct.distributionAmount
       let distribStruct = await dm.methods.allDistributors(0).call()
@@ -1181,7 +1181,7 @@ sendDistribution.onclick = async () => {
         console.log('Message ' + e.message )
         console.log('Code ' + e.code )
 //        console.log('Reason ' + e.reason )
-      }    
+      }
   }
 }
 /*
@@ -1209,4 +1209,3 @@ async function getRevertReason(txHash){
 
   }
 */
-
