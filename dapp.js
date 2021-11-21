@@ -1031,6 +1031,9 @@ const setButtons = function() {
 
 const canSendFunds = async function() {
   const inputDistributionID = document.getElementById('inputDistributionID').value;
+  var web3 = new Web3(window.ethereum)
+  const dm = new web3.eth.Contract(contractABI, contractAddress)
+  dm.setProvider(window.ethereum)
 
   let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
   let sendAmount = distributionsStruct.distributionAmount
