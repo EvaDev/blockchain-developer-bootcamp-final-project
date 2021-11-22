@@ -1034,10 +1034,10 @@ const canSendFunds = async function() {
   var web3 = new Web3(window.ethereum)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
   dm.setProvider(window.ethereum)
-
   let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
+  console.log('Hello')
   let sendAmount = distributionsStruct.distributionAmount
-  let distribStruct = await dm.methods.allDistributors(0).call()
+  let distribStruct = await dm.methods.allDistributors(distributionsStruct.distributorID).call()
   const distAddr   = distribStruct.distributorAddress
   console.log('Distr Addr looked up from contract ' + distAddr + '_' + sendAmount)
   console.log('Distr Status ' + distributionsStruct.distributionState)
