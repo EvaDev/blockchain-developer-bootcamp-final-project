@@ -543,11 +543,6 @@ const contractABI = [  {
         "internalType": "uint32",
         "name": "_donorID",
         "type": "uint32"
-      },
-      {
-        "internalType": "address payable",
-        "name": "recipient",
-        "type": "address"
       }
     ],
     "name": "giveFunds",
@@ -1001,7 +996,9 @@ const setButtons = function() {
       addDonation.disabled = false;
       makeDonationBtn.disabled = false;
       //approveDistribution.disabled = false;
-      canSendFunds();
+      if (document.getElementById('inputDistributionID').value >= 0) {
+        canSendFunds();
+      }
       //console.log('Enabled Donation? ' + addDonation.disabled)
       mmMessage.innerHTML = 'MetaMask IS Connected as DONOR ID ' + currentDonorID + ' bal ' + showBalance
     }
@@ -1034,6 +1031,7 @@ const canSendFunds = async function() {
   var web3 = new Web3(window.ethereum)
   const dm = new web3.eth.Contract(contractABI, contractAddress)
   dm.setProvider(window.ethereum)
+  console.log('Distribution' + inputDistributionID)
   let distributionsStruct = await dm.methods.distributions(inputDistributionID).call()
   console.log('Hello')
   let sendAmount = distributionsStruct.distributionAmount
