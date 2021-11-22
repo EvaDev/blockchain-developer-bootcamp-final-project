@@ -35,6 +35,16 @@ Distributions can only come from one donation
 
 ![Screenshot](Assets/model.png)
 
+Github Pages
+https://evadev.github.io/blockchain-developer-bootcamp-final-project/
+
+Srceen Cast Links
+Step 1 Introduction - Adding a donor : https://youtu.be/UppSs_rRqgM  
+Step 2 Funding a donation : https://youtu.be/epJIJGjbKPk  
+Step 3 Create Distribution : https://youtu.be/EDkjfn3IOAc  
+Step 4 Send Funds : https://youtu.be/I6UpjxZe3Os  
+Step 5 Conclusion : https://youtu.be/16mC8J7B0YA  
+
 **Directory structure**
 /contracts :    Contains the Solidity source files for our smart contracts.  
 /migrations :   scripts to migrate  
@@ -46,12 +56,15 @@ Distributions can only come from one donation
         dependency npm install --save-dev mocha chai  
 /node_modules/  contains the openzeppelin contracts  
         dependency npm install --save-dev @openzeppelin/contracts  
-/Instructions : contains      avoiding_common_attacks.md & design_pattern_decisions.md    
+/Design Decisions : contains      avoiding_common_attacks.md & design_pattern_decisions.md    
 Root Folder  
 truffle-config.js: Truffle configuration file  
 index.html  
+dapp.js
+style.css
 package.json  
 README.md  
+deployed_address.txt
 
 **Run Instructions**
 1. in one terminal window
@@ -66,30 +79,21 @@ README.md
 **Dependencies**
 These are the commands I ran for my project
 
-npm init -y
-
-node v16.13.0
-
-npm install --save-dev truffle
-
-npx truffle init
+npm init -y  
+node v16.13.0  
+npm install --save-dev truffle  
+npx truffle init  
 
 create contract /Contracts/DonationManager.sol
 Update truffle-config for compiler version
 create the deployment file /migrations/2_deploy_contracts.js
 
-npm install --save-dev chai
-
-npm install --save-dev @openzeppelin/test-helpers
-
-npm install --save-dev @openzeppelin/test-environment
-
-npm install --save-dev mocha chai
-
-npm install --save-dev @openzeppelin/contracts
-
-npm install -g truffle-expect truffle-config web3
-
+npm install --save-dev chai  
+npm install --save-dev @openzeppelin/test-helpers  
+npm install --save-dev @openzeppelin/test-environment  
+npm install --save-dev mocha chai  
+npm install --save-dev @openzeppelin/contracts  
+npm install -g truffle-expect truffle-config web3  
 npx truffle compile
 
 Create the test file /test/DonationManager.test.js
@@ -97,8 +101,7 @@ For testing use Ganache set up on port 8545 network ID 1337
 To run the tests run this :
 truffle test — show-events
 
-npx truffle migrate --network development
-
+npx truffle migrate --network development  
 npm install -g truffle-abi     (For just generating ABI)
 
 truffle-abi
@@ -114,14 +117,7 @@ npm i dotenv
 npm install @truffle/hdwallet-provider
 Update truffle-config.js
 
-For Deployment to Heroku  :
-brew tap heroku/brew && brew install heroku
 
-git remote add heroku  https://git.heroku.com/consensysfp.git
-
-npm install gh-pages --save-dev
-update package.json file with scripts & homepage
-npm run deploy
 
 **Simplifying assumptions:**
 The basis of such a system is trust. This project will not definitively provide the ideal trust mechanisms necessary, but its worth describing them for completeness.
