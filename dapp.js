@@ -1176,7 +1176,7 @@ sendDistribution.onclick = async () => {
       console.log('Distr Addr looked up from contract ' + distAddr + '_' + sendAmount)
       console.log('Distr Status ' + distributionsStruct.distributionState)
       if (distributionsStruct.distributionState == 1 ) {
-        await dm.methods.giveFunds(inputDistributionID, currentDonorID, distAddr).send({from: ethereum.selectedAddress})
+        await dm.methods.giveFunds(inputDistributionID, currentDonorID).send({from: ethereum.selectedAddress})
         //await dm.methods.giveFunds(inputDistributionID, currentDonorID, distAddr).send({from: dm.contractAddress})
         await web3.eth.sendTransaction({to : distAddr, value: sendAmount, from: ethereum.selectedAddress})
       }
