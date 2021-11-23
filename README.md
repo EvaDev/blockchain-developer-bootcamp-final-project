@@ -35,15 +35,9 @@ Distributions can only come from one donation
 
 ![Screenshot](Assets/model.png)
 
-Github Pages
-https://evadev.github.io/blockchain-developer-bootcamp-final-project/
+Github Pages :  https://evadev.github.io/blockchain-developer-bootcamp-final-project/
 
-Srceen Cast Links
-Step 1 Introduction - Adding a donor : https://youtu.be/UppSs_rRqgM  
-Step 2 Funding a donation : https://youtu.be/epJIJGjbKPk  
-Step 3 Create Distribution : https://youtu.be/EDkjfn3IOAc  
-Step 4 Send Funds : https://youtu.be/I6UpjxZe3Os  
-Step 5 Conclusion : https://youtu.be/16mC8J7B0YA  
+Srceen Cast Link : https://youtu.be/WVcYUN8oPa0
 
 **Directory structure**
 /contracts :    Contains the Solidity source files for our smart contracts.  
@@ -67,7 +61,11 @@ README.md
 deployed_address.txt
 
 **Run Instructions**
-1. in one terminal window
+You can deploy to dev by only chnaging line 4 of dapp.js
+    const contractAddress = '0x331A60480eC566e8214151bD268Fe08498Bb5EA0'
+to your local value.
+
+1. in one terminal window, or from the ganache GUI
     npx ganache-cli --deterministic
 2. in a second terminal window
    truffle test
@@ -75,6 +73,8 @@ deployed_address.txt
    to recompile all
    npx truffle compile --all
   (npx?) truffle compile && mocha --exit --recursive
+
+If you redeploy to Ropsten then you need to add your infura key and mnemonic to you local .env file.
 
 **Dependencies**
 These are the commands I ran for my project
